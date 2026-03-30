@@ -1,6 +1,11 @@
 shellEmulator: true
 trustPolicy: no-downgrade
+ignoredBuiltDependencies:
+  - better-sqlite3
 onlyBuiltDependencies:
   - '@parcel/watcher'
+  - better-sqlite3
   - esbuild
   - unrs-resolver
+trustDowngradeAllowList:
+  - semver@6.3.1

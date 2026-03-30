@@ -14,19 +14,24 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@nuxt/a11y": "1.0.0-alpha.1",
     "@nuxt/eslint": "1.15.2",
     "@nuxt/fonts": "0.14.0",
     "@nuxt/ui": "^4.6.0",
     "@pinia/nuxt": "^0.11.3",
+    "@vueuse/core": "^14.2.1",
+    "better-sqlite3": "^12.8.0",
+    "drizzle-orm": "^0.45.2",
     "nuxt": "^4.4.2",
     "tailwindcss": "^4.2.2",
     "vue": "^3.5.31",
-    "vue-router": "^4.6.4"
+    "vue-router": "^4.6.4",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^7.7.3",
     "@iconify-json/lucide": "^1.2.100",
+    "@types/better-sqlite3": "^7.6.13",
+    "drizzle-kit": "^0.31.10",
     "eslint-plugin-format": "^2.0.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",

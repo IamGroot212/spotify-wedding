@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Nuxt 4 + Nuxt UI v4 template for building webpages. German-language target (`lang="de"`). Uses pnpm as the package manager.
+**Spotify Wedding** — A private wedding song request web app. Guests scan a QR code, search for songs, and submit requests. The admin (groom/bride) moderates requests and controls the Spotify queue. Built on Nuxt 4 + Nuxt UI v4. German-language target (`lang="de"`).
 
 ## Commands
 
 ```bash
 pnpm install          # Install dependencies
 pnpm dev              # Dev server on http://localhost:3000
-pnpm build            # Production build
+pnpm build            # Production build (node-server preset)
 pnpm preview          # Preview production build
 pnpm lint             # Run ESLint
 pnpm lint:fix         # Run ESLint with auto-fix
@@ -20,31 +20,69 @@ pnpm typecheck        # Type-check (runs nuxt prepare first)
 
 ## Architecture
 
-- **Nuxt 4** with app directory structure (`app/` contains pages, layouts, components, composables, etc.)
-- **Nuxt UI v4** — component library built on Tailwind CSS v4. Use `<U*>` components (e.g. `<UButton>`, `<UCard>`). Wrap the app root with `<UApp>`.
-- **Pinia** for state management (`@pinia/nuxt`)
-- **@nuxt/fonts** for automatic font loading (Inter as default sans font)
-- **@nuxt/a11y** for accessibility checks
-- **Lucide** icon set (`@iconify-json/lucide`) — use via Nuxt UI's icon prop
+### Frontend
+- **Nuxt 4** with `app/` directory structure
+- **Nuxt UI v4** — all UI built with `<U*>` components
+- **Pinia** for state management
+- **@vueuse/core** for utilities (debounce, interval polling)
+- Mobile-first guest page, desktop-friendly admin dashboard
+
+### Backend
+- **Nitro server routes** in `server/api/`
+- **Drizzle ORM + better-sqlite3** for data persistence (SQLite with WAL mode)
+- **Spotify Web API** integration via `server/utils/spotify.ts`
+- All Spotify tokens stored server-side only, never exposed to client
+
+### Key Directories
+- `app/pages/` — Guest page (`index.vue`), Admin (`admin/index.vue`, `admin/login.vue`)
+- `app/components/guest/` — NowPlaying, QueueList, SongSearch
+- `app/components/admin/` — RequestList, SpotifyStatus
+- `app/composables/` — useNowPlaying, useSpotifyQueue, useSongSearch, useSongRequest, useAdminAuth
+- `app/middleware/admin.ts` — Client-side admin route guard
+- `server/api/spotify/` — Search, now-playing, queue, devices
+- `server/api/requests/` — CRUD for song requests
+- `server/api/admin/` — Login, session, queue management, settings
+- `server/api/auth/spotify/` — OAuth connect/callback/status
+- `server/utils/` — db.ts (Drizzle instance), spotify.ts (API client), auth.ts (session management)
+- `server/db/schema.ts` — Drizzle schema (songRequests, spotifyTokens, appSettings)
+- `server/middleware/` — adminAuth.ts, rateLimit.ts
+- `server/plugins/migrations.ts` — Auto-create tables on startup
+
+## Environment Variables
+
+Set in `.env` (see `.env.example`):
+- `NUXT_SPOTIFY_CLIENT_ID` — Spotify app client ID
+- `NUXT_SPOTIFY_CLIENT_SECRET` — Spotify app client secret
+- `NUXT_SPOTIFY_REDIRECT_URI` — OAuth callback URL
+- `NUXT_ADMIN_PASSWORD` — Admin login password
+- `NUXT_DATABASE_PATH` — SQLite file path (default: `.data/db.sqlite`)
+- `NUXT_PUBLIC_BASE_URL` — Public base URL
 
 ## Styling
 
-- Tailwind CSS v4 — imported via `@import 'tailwindcss'` and `@import '@nuxt/ui'` in `app/assets/css/main.css`
-- Theme tokens defined in `@theme static` block in `main.css` (neutral color palette, font family)
-- UI colors configured in `app/app.config.ts` (primary: blue, secondary: slate, neutral: neutral)
+- Tailwind CSS v4 via `@import 'tailwindcss'` and `@import '@nuxt/ui'` in `app/assets/css/main.css`
+- Theme tokens in `@theme static` block in `main.css`
+- UI colors in `app/app.config.ts` (primary: green, secondary: slate, neutral: neutral)
+- All design overrides centralized in `app.config.ts` for easy Stitch design integration later
 
 ## Code Style & Linting
 
-- **Always run `pnpm lint:fix` first** when encountering lint errors — most issues (key ordering, formatting, imports) are auto-fixable
-- ESLint with **@antfu/eslint-config** integrated via `@nuxt/eslint` module
-- Formatting handled by ESLint (no Prettier) — 2-space indent, single quotes, semicolons
-- `type` keyword preferred over `interface` (`ts/consistent-type-definitions: ['error', 'type']`)
-- Imports auto-sorted by `perfectionist/sort-imports`
-- Direct `process.env` access disallowed (`n/no-process-env: error`) — use `useRuntimeConfig()` instead
-- Filenames must be camelCase, kebab-case, or PascalCase
-- pnpm settings go in `pnpm-workspace.yaml`, not in `package.json` (enforced by `pnpm/json-prefer-workspace-settings` rule)
-- YAML and JSON keys must be sorted alphabetically (enforced by `yaml/sort-keys` and `jsonc/sort-keys`)
+- **Always run `pnpm lint:fix` first** when encountering lint errors
+- ESLint with **@antfu/eslint-config** via `@nuxt/eslint`
+- 2-space indent, single quotes, semicolons
+- `type` keyword preferred over `interface`
+- Direct `process.env` access disallowed — use `useRuntimeConfig()`
+- YAML and JSON keys must be sorted alphabetically
+
+## Key Design Decisions
+
+- **Plain password comparison** for admin (private event tool, not public service)
+- **In-memory session store** (single-process, Raspberry Pi deployment)
+- **SQLite** for simplicity and Pi compatibility (no external DB needed)
+- **Polling** for real-time updates (configurable intervals in runtimeConfig)
+- **Server-side only** Spotify operations (no client-side token exposure)
+- **Request moderation** by default (admin approves before queue)
 
 ## Git Hooks
 
-- **Husky** pre-commit hook runs **lint-staged**, which auto-fixes ESLint on `*.{js,ts,mjs,cjs,vue}` files before commit
+- **Husky** pre-commit hook runs **lint-staged** on `*.{js,ts,mjs,cjs,vue}` files

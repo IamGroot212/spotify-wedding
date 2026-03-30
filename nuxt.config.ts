@@ -8,7 +8,6 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@pinia/nuxt',
     '@nuxt/fonts',
-    '@nuxt/a11y',
   ],
 
   css: ['~/assets/css/main.css'],
@@ -22,7 +21,30 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'de' },
-      title: 'Nuxt Template',
+      title: 'Spotify Wedding',
     },
+  },
+
+  runtimeConfig: {
+    // Private (server-only)
+    adminPassword: '',
+    databasePath: '.data/db.sqlite',
+    spotifyClientId: '',
+    spotifyClientSecret: '',
+    spotifyRedirectUri: 'http://192.168.0.2:3002/api/auth/spotify/callback',
+
+    // Public (available on client)
+    public: {
+      baseUrl: 'http://192.168.0.2:3002',
+      pollingIntervals: {
+        adminRefresh: 3000,
+        nowPlaying: 5000,
+        queue: 10000,
+      },
+    },
+  },
+
+  nitro: {
+    preset: 'node-server',
   },
 });

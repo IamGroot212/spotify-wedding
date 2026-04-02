@@ -6,14 +6,14 @@
 - [x] Admin-Passwort: sicheres Passwort gesetzt
 - [ ] Spotify Redirect URI: nur `https://camavor.de/...` in Spotify Dashboard, Dev-URIs entfernen
 - [x] GitHub Actions CI/CD: Pi als Self-Hosted Runner, Auto-Deploy auf Push to main
-- [ ] Tests: API-Tests (Vitest) für alle Server-Endpunkte
+- [x] Tests: API-Tests (Vitest) für alle Server-Endpunkte (21 Tests)
 - [ ] Tests: E2E-Tests (Playwright) — Guest-Flow + Admin-Flow
 - [ ] SSR-Fix prüfen: aktuell SPA-Mode wegen Node 22 Vue-Bug — ggf. mit Node 20 testen
 
 ## Funktional
 
-- [ ] QR-Code Seite: `/qr` Route mit druckbarem QR-Code zu camavor.de
-- [ ] Splash/Welcome Screen: "The Midnight Concierge" Landing mit Namen des Brautpaars
+- [x] QR-Code Seite: `/qr` Route mit druckbarem QR-Code zu camavor.de
+- [x] Splash/Welcome Screen: "The Midnight Concierge" Landing
 - [ ] Gast-Queue-Status: Gäste sehen ob ihr Vorschlag angenommen/abgelehnt wurde (via Session-ID)
 - [ ] Admin: Live-Counter (eingegangen / genehmigt / abgelehnt / in Queue)
 - [ ] Admin: Bulk Actions (mehrere Requests auf einmal annehmen/ablehnen)

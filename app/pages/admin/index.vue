@@ -4,7 +4,6 @@ definePageMeta({ middleware: 'admin' });
 const route = useRoute();
 const toast = useToast();
 
-// Handle OAuth redirect messages
 onMounted(() => {
   if (route.query.spotify === 'connected') {
     toast.add({ color: 'success', title: 'Spotify erfolgreich verbunden!' });
@@ -21,45 +20,49 @@ const { data: nowPlaying } = useNowPlaying();
 </script>
 
 <template>
-  <div class="mx-auto max-w-4xl px-4 py-6">
-    <header class="mb-6">
-      <h1 class="text-2xl font-bold">
-        Admin
-      </h1>
-      <p class="text-sm text-neutral-500 dark:text-neutral-400">
-        Songvorschläge verwalten & Spotify-Status
-      </p>
-    </header>
+  <div class="flex min-h-svh bg-[#141312]">
+    <!-- Main Content -->
+    <main class="min-w-0 flex-1 pb-24">
+      <!-- Header -->
+      <header class="sticky top-0 z-40 flex items-center justify-between bg-[#141312] px-6 py-4">
+        <div>
+          <h1 class="font-serif text-2xl italic text-gold-300">
+            Admin Concierge
+          </h1>
+          <p class="mt-0.5 text-[10px] uppercase tracking-[0.1em] text-gold-300/40">
+            Songvorschläge verwalten
+          </p>
+        </div>
+        <AdminSpotifyStatus />
+      </header>
 
-    <div class="grid gap-6 lg:grid-cols-3">
-      <div class="space-y-6 lg:col-span-2">
-        <UCard>
-          <template #header>
-            <h2 class="font-semibold">
-              Songvorschläge
-            </h2>
-          </template>
-          <AdminRequestList />
-        </UCard>
-      </div>
-
-      <div class="space-y-6">
-        <UCard>
-          <AdminSpotifyStatus />
-        </UCard>
-
-        <UCard>
-          <template #header>
-            <h2 class="font-semibold">
-              Gerade läuft
-            </h2>
-          </template>
-          <GuestNowPlaying
-            :data="nowPlaying"
-            :is-connected="true"
+      <div class="mx-auto max-w-5xl px-6 py-4">
+        <!-- Now Playing (compact) -->
+        <div class="mb-6 flex items-center gap-4 rounded-2xl bg-[#1d1b1a] p-4">
+          <img
+            v-if="nowPlaying?.track?.coverUrl"
+            :src="nowPlaying.track.coverUrl"
+            :alt="nowPlaying.track.title"
+            class="size-12 rounded-lg object-cover shadow-lg"
+          >
+          <div v-if="nowPlaying?.track" class="min-w-0 flex-1">
+            <p class="truncate font-serif text-sm italic text-gold-200">
+              {{ nowPlaying.track.title }}
+            </p>
+            <p class="truncate text-xs text-neutral-200/60">
+              {{ nowPlaying.track.artist }}
+            </p>
+          </div>
+          <span v-else class="text-sm text-neutral-200/40">Kein Song aktiv</span>
+          <span
+            v-if="nowPlaying?.isPlaying"
+            class="size-2 shrink-0 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"
           />
-        </UCard>
+        </div>
+
+        <!-- Request List -->
+        <AdminRequestList />
       </div>
-    </div>
+    </main>
   </div>
 </template>

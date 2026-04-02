@@ -29,7 +29,7 @@ onUnmounted(() => pause());
 const toast = useToast();
 const processingId = ref<number | null>(null);
 
-async function updateStatus(id: number, status: 'approved' | 'queued' | 'rejected') {
+async function updateStatus(id: number, status: 'queued' | 'rejected') {
   processingId.value = id;
   try {
     await $fetch(`/api/requests/${id}`, {
@@ -38,11 +38,7 @@ async function updateStatus(id: number, status: 'approved' | 'queued' | 'rejecte
     });
     toast.add({
       color: 'success',
-      title: status === 'queued'
-        ? 'Zur Queue hinzugefügt'
-        : status === 'approved'
-          ? 'Genehmigt'
-          : 'Abgelehnt',
+      title: status === 'queued' ? 'Zur Queue hinzugefügt' : 'Abgelehnt',
     });
     await refresh();
   }
@@ -59,113 +55,141 @@ async function updateStatus(id: number, status: 'approved' | 'queued' | 'rejecte
 
 const statusOptions = [
   { label: 'Ausstehend', value: 'pending' },
-  { label: 'Genehmigt', value: 'approved' },
   { label: 'In Queue', value: 'queued' },
   { label: 'Abgelehnt', value: 'rejected' },
-  { label: 'Gespielt', value: 'played' },
   { label: 'Alle', value: 'all' },
 ];
 
-const statusColors: Record<string, 'error' | 'info' | 'neutral' | 'success' | 'warning'> = {
-  approved: 'info',
-  pending: 'warning',
-  played: 'neutral',
-  queued: 'success',
-  rejected: 'error',
-};
-
-function formatTime(dateStr: string): string {
-  return new Date(dateStr).toLocaleTimeString('de-DE', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const min = Math.floor(diff / 60000);
+  if (min < 1)
+    return 'gerade eben';
+  if (min < 60)
+    return `vor ${min} Min`;
+  const hours = Math.floor(min / 60);
+  return `vor ${hours} Std`;
 }
+
+const pendingCount = computed(() =>
+  statusFilter.value === 'pending' ? data.value?.requests.length || 0 : null,
+);
 </script>
 
 <template>
-  <div class="space-y-4">
-    <div class="flex flex-wrap gap-2">
-      <UButton
+  <div class="space-y-6">
+    <!-- Filter Tabs -->
+    <div class="flex gap-2">
+      <button
         v-for="opt in statusOptions"
         :key="opt.value"
-        :color="statusFilter === opt.value ? 'primary' : 'neutral'"
-        :variant="statusFilter === opt.value ? 'solid' : 'outline'"
-        size="sm"
+        :class="statusFilter === opt.value
+          ? 'bg-gold-300 text-[#6a5314] font-bold'
+          : 'bg-transparent text-gold-200/40 border border-white/10 hover:bg-white/5'"
+        class="rounded-lg px-4 py-2 text-xs uppercase tracking-wider transition-all"
         @click="statusFilter = opt.value"
       >
         {{ opt.label }}
-      </UButton>
+        <span
+          v-if="opt.value === 'pending' && pendingCount"
+          class="ml-1 rounded-md bg-[#6a5314]/30 px-1.5 py-0.5 text-[10px]"
+        >
+          {{ pendingCount }}
+        </span>
+      </button>
     </div>
 
-    <div v-if="fetchStatus === 'pending' && !data" class="space-y-3">
-      <USkeleton v-for="i in 3" :key="i" class="h-20 w-full" />
+    <!-- Loading -->
+    <div v-if="fetchStatus === 'pending' && !data" class="space-y-4">
+      <div v-for="i in 3" :key="i" class="h-24 animate-pulse rounded-2xl bg-neutral-600" />
     </div>
 
-    <div v-else-if="data?.requests.length" class="space-y-3">
+    <!-- Request Cards -->
+    <div v-else-if="data?.requests.length" class="space-y-4">
       <div
         v-for="req in data.requests"
         :key="req.id"
-        class="flex items-start gap-3 rounded-lg border border-neutral-200 p-3 dark:border-neutral-800"
+        class="flex flex-col gap-4 rounded-2xl bg-[#211f1e] p-4 transition-all duration-300 hover:bg-neutral-500 md:flex-row md:items-center md:gap-6 md:p-6"
       >
-        <img
-          v-if="req.coverUrl"
-          :alt="req.title"
-          :src="req.coverUrl"
-          class="size-12 shrink-0 rounded"
-        >
-
-        <div class="min-w-0 flex-1">
-          <div class="flex items-start justify-between gap-2">
-            <div class="min-w-0">
-              <p class="truncate font-medium">
-                {{ req.title }}
-              </p>
-              <p class="truncate text-sm text-neutral-500">
-                {{ req.artist }}
-              </p>
+        <!-- Song Info -->
+        <div class="flex min-w-0 flex-1 items-center gap-4 md:gap-6">
+          <div class="relative shrink-0">
+            <img
+              v-if="req.coverUrl"
+              :alt="req.title"
+              :src="req.coverUrl"
+              class="size-16 rounded-xl object-cover shadow-lg md:size-20"
+            >
+            <div v-else class="flex size-16 items-center justify-center rounded-xl bg-neutral-500 md:size-20">
+              <UIcon class="size-6 text-neutral-300" name="i-lucide-music" />
             </div>
-            <UBadge
-              :color="statusColors[req.status] || 'neutral'"
-              size="xs"
-              variant="subtle"
-            >
-              {{ req.status }}
-            </UBadge>
           </div>
 
-          <div class="mt-1 flex items-center gap-2 text-xs text-neutral-400">
-            <span v-if="req.requestedBy">von {{ req.requestedBy }}</span>
-            <span>{{ formatTime(req.createdAt) }}</span>
+          <div class="min-w-0 flex-1">
+            <h3 class="truncate font-serif text-lg text-neutral-50 md:text-xl">
+              {{ req.title }}
+            </h3>
+            <p class="text-sm font-medium text-gold-300/70">
+              {{ req.artist }}<span v-if="req.album"> · {{ req.album }}</span>
+            </p>
+            <div class="mt-1 flex items-center gap-4 text-[10px] uppercase tracking-widest text-neutral-200">
+              <span v-if="req.requestedBy" class="flex items-center gap-1">
+                <UIcon class="size-3" name="i-lucide-user" />
+                {{ req.requestedBy }}
+              </span>
+              <span class="flex items-center gap-1">
+                <UIcon class="size-3" name="i-lucide-clock" />
+                {{ timeAgo(req.createdAt) }}
+              </span>
+            </div>
           </div>
+        </div>
 
-          <div v-if="req.status === 'pending'" class="mt-2 flex gap-2">
-            <UButton
-              :disabled="processingId === req.id"
-              :loading="processingId === req.id"
-              color="primary"
-              icon="i-lucide-check"
-              size="xs"
-              @click="updateStatus(req.id, 'queued')"
-            >
-              Annehmen
-            </UButton>
-            <UButton
-              :disabled="processingId === req.id"
-              color="error"
-              icon="i-lucide-x"
-              size="xs"
-              variant="outline"
-              @click="updateStatus(req.id, 'rejected')"
-            >
-              Ablehnen
-            </UButton>
-          </div>
+        <!-- Actions -->
+        <div v-if="req.status === 'pending'" class="flex items-center gap-3 md:border-l md:border-white/5 md:pl-6">
+          <button
+            :disabled="processingId === req.id"
+            class="flex-1 rounded-xl bg-gold-300 px-6 py-3 text-sm font-bold tracking-wide text-[#6a5314] shadow-md transition-all active:scale-95 disabled:opacity-50 md:flex-none"
+            @click="updateStatus(req.id, 'queued')"
+          >
+            {{ processingId === req.id ? '...' : 'Annehmen' }}
+          </button>
+          <button
+            :disabled="processingId === req.id"
+            class="flex-1 rounded-xl border border-white/10 bg-transparent px-6 py-3 text-sm font-medium text-gold-200/60 transition-all hover:bg-white/5 disabled:opacity-50 md:flex-none"
+            @click="updateStatus(req.id, 'rejected')"
+          >
+            Ablehnen
+          </button>
+        </div>
+
+        <!-- Status Badge (non-pending) -->
+        <div v-else class="md:pl-6">
+          <span
+            :class="{
+              'bg-emerald-500/20 text-emerald-400': req.status === 'queued',
+              'bg-[#93000a]/20 text-[#ffb4ab]': req.status === 'rejected',
+              'bg-neutral-500 text-neutral-200': req.status === 'played',
+            }"
+            class="inline-block rounded-lg px-3 py-1 text-xs font-bold uppercase tracking-wider"
+          >
+            {{ req.status === 'queued' ? 'In Queue' : req.status === 'rejected' ? 'Abgelehnt' : req.status }}
+          </span>
         </div>
       </div>
     </div>
 
-    <p v-else class="py-6 text-center text-sm text-neutral-400">
-      Keine Vorschläge für diesen Filter
-    </p>
+    <!-- Empty State -->
+    <div v-else class="flex flex-col items-center justify-center py-16 text-center">
+      <div class="mb-4 flex size-20 items-center justify-center rounded-full bg-neutral-500 text-gold-300/20">
+        <UIcon class="size-10" name="i-lucide-music-off" />
+      </div>
+      <h4 class="font-serif text-xl text-neutral-50">
+        Keine Vorschläge
+      </h4>
+      <p class="mt-1 text-sm text-neutral-200/60">
+        Aktuell keine Einträge für diesen Filter.
+      </p>
+    </div>
   </div>
 </template>

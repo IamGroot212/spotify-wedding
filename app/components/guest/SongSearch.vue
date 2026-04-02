@@ -44,12 +44,15 @@ async function handleSubmit(track: (typeof results.value)[0]) {
     </div>
 
     <!-- Error -->
-    <UAlert
+    <div
       v-if="error"
-      :description="error"
-      color="error"
-      icon="i-lucide-alert-circle"
-    />
+      class="flex items-center gap-3 rounded-xl bg-[#93000a]/20 px-4 py-3"
+    >
+      <UIcon class="size-5 shrink-0 text-[#ffb4ab]" name="i-lucide-alert-circle" />
+      <p class="text-sm text-[#ffb4ab]">
+        {{ error }}
+      </p>
+    </div>
 
     <!-- Results -->
     <div v-if="results.length" class="space-y-8">

@@ -25,6 +25,9 @@ function onSubmitted() {
       </h1>
     </header>
 
+    <!-- Connection Banner -->
+    <GuestConnectionBanner :is-connected="isConnected" />
+
     <!-- Search Overlay -->
     <Transition
       enter-active-class="transition-transform duration-300 ease-out"

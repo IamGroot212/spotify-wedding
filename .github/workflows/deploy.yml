@@ -7,6 +7,9 @@ on:
 jobs:
   deploy:
     runs-on: [self-hosted, pi]
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,18 +29,15 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: pnpm lint
+        run: pnpm run lint
 
       - name: Build
-        run: pnpm build
+        run: pnpm run build
 
       - name: Deploy
         run: |
-          # Copy build output to project directory
           rsync -a --delete .output/ /home/febec/Programming/claude/spotify-wedding/.output/
-
-          # Restart the service
-          sudo systemctl restart spotify-wedding
+          sudo /usr/bin/systemctl restart spotify-wedding
 
       - name: Health check
         run: |

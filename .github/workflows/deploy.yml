@@ -29,10 +29,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: pnpm run lint
+        run: pnpm exec eslint .
 
       - name: Build
-        run: pnpm run build
+        run: pnpm exec nuxt build
 
       - name: Deploy
         run: |

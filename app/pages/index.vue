@@ -3,7 +3,6 @@ const { data: nowPlaying, isConnected, refresh: refreshNowPlaying } = useNowPlay
 const { data: queueData, isLoading: queueLoading, refresh: refreshQueue } = useSpotifyQueue();
 
 function onSubmitted() {
-  // Refresh queue shortly after submission to pick up changes
   setTimeout(() => {
     refreshQueue();
     refreshNowPlaying();
@@ -12,33 +11,28 @@ function onSubmitted() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-lg px-4 py-6">
-    <header class="mb-6 text-center">
-      <h1 class="text-2xl font-bold">
+  <div class="mx-auto max-w-lg px-5 py-8">
+    <header class="mb-10 text-center">
+      <h1 class="font-serif text-3xl font-light tracking-tight text-gold-200">
         Songwunsch
       </h1>
-      <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+      <p class="mt-2 text-sm tracking-wide text-neutral-200">
         Welchen Song möchtest du hören?
       </p>
     </header>
 
-    <section class="mb-8">
+    <section class="mb-10">
       <GuestSongSearch @submitted="onSubmitted" />
     </section>
 
-    <UDivider class="my-6" />
-
-    <section class="mb-6">
-      <h2 class="mb-3 text-lg font-semibold">
-        Gerade läuft
-      </h2>
+    <section class="mb-8">
       <GuestNowPlaying :data="nowPlaying" :is-connected="isConnected" />
     </section>
 
     <section>
-      <div class="mb-3 flex items-center justify-between">
-        <h2 class="text-lg font-semibold">
-          Warteschlange
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="font-serif text-lg font-light tracking-tight text-gold-200">
+          Als Nächstes
         </h2>
         <UButton
           color="neutral"

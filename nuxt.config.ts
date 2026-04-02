@@ -31,11 +31,11 @@ export default defineNuxtConfig({
     databasePath: '.data/db.sqlite',
     spotifyClientId: '',
     spotifyClientSecret: '',
-    spotifyRedirectUri: 'http://192.168.0.2:3002/api/auth/spotify/callback',
+    spotifyRedirectUri: '',
 
     // Public (available on client)
     public: {
-      baseUrl: 'http://192.168.0.2:3002',
+      baseUrl: '',
       pollingIntervals: {
         adminRefresh: 3000,
         nowPlaying: 5000,
@@ -43,6 +43,8 @@ export default defineNuxtConfig({
       },
     },
   },
+
+  ssr: false,
 
   nitro: {
     preset: 'node-server',

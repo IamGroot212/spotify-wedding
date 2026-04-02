@@ -2,19 +2,82 @@
 @import '@nuxt/ui';
 
 @theme static {
-  /* Default neutral color palette */
-  --color-neutral-50: #f8fafc;
-  --color-neutral-100: #f1f5f9;
-  --color-neutral-200: #e2e8f0;
-  --color-neutral-300: #cbd5e1;
-  --color-neutral-400: #94a3b8;
-  --color-neutral-500: #64748b;
-  --color-neutral-600: #475569;
-  --color-neutral-700: #334155;
-  --color-neutral-800: #1e293b;
-  --color-neutral-900: #0f172a;
-  --color-neutral-950: #020617;
+  /* "The Midnight Concierge" — warm dark palette from Stitch design */
+  --color-neutral-50: #e6e1df;
+  --color-neutral-100: #cfc5b4;
+  --color-neutral-200: #989080;
+  --color-neutral-300: #4c4639;
+  --color-neutral-400: #363433;
+  --color-neutral-500: #2b2a28;
+  --color-neutral-600: #211f1e;
+  --color-neutral-700: #1d1b1a;
+  --color-neutral-800: #141312;
+  --color-neutral-900: #0f0e0d;
+  --color-neutral-950: #0a0908;
 
-  /* Font families */
+  /* Gold / Champagne primary */
+  --color-gold-50: #fff9e6;
+  --color-gold-100: #ffdf94;
+  --color-gold-200: #ffe6ae;
+  --color-gold-300: #e8c97e;
+  --color-gold-400: #e2c379;
+  --color-gold-500: #d6c5a1;
+  --color-gold-600: #c4b391;
+  --color-gold-700: #725b1c;
+  --color-gold-800: #594403;
+  --color-gold-900: #3e2e00;
+  --color-gold-950: #241a00;
+
+  /* Font families — Newsreader (serif) for display, Inter for body */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Newsreader', 'Georgia', serif;
+}
+
+/* Force dark mode — this is a dark-only design */
+:root {
+  color-scheme: dark;
+}
+
+/* Global background */
+body {
+  background-color: #141312;
+  color: #e6e1df;
+}
+
+/* Shimmer animation for Now Playing */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-gold {
+  background: linear-gradient(
+    90deg,
+    rgba(232, 201, 126, 0) 0%,
+    rgba(232, 201, 126, 0.06) 50%,
+    rgba(232, 201, 126, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(33, 31, 30, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Ghost border for inputs — felt, not seen */
+.ghost-border {
+  box-shadow: inset 0 0 0 1px rgba(207, 197, 180, 0.15);
+}
+
+/* No-scroll bounce on iOS */
+html {
+  overscroll-behavior: none;
 }

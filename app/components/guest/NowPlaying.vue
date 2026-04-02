@@ -7,7 +7,6 @@ const props = defineProps<{
   isConnected: boolean;
 }>();
 
-// Track when we last received data from the server
 const lastServerUpdate = ref(Date.now());
 const serverProgressMs = ref(0);
 
@@ -18,13 +17,11 @@ watch(() => props.data?.progressMs, (newProgress) => {
   }
 });
 
-// Interpolate progress between polls
 const now = useTimestamp({ interval: 500 });
 
 const interpolatedProgress = computed(() => {
   if (!props.data?.track || !props.data.isPlaying)
     return serverProgressMs.value;
-
   const elapsed = now.value - lastServerUpdate.value;
   return Math.min(
     serverProgressMs.value + elapsed,
@@ -46,7 +43,7 @@ function formatTime(ms: number): string {
 </script>
 
 <template>
-  <div class="space-y-3">
+  <div>
     <UAlert
       v-if="!isConnected"
       color="warning"
@@ -55,51 +52,57 @@ function formatTime(ms: number): string {
       title="Keine Verbindung"
     />
 
-    <div v-else-if="data?.track" class="flex items-center gap-4">
-      <img
-        v-if="data.track.coverUrl"
-        :alt="`${data.track.title} Cover`"
-        :src="data.track.coverUrl"
-        class="size-16 shrink-0 rounded-lg shadow-md sm:size-20"
-      >
-      <div
-        v-else
-        class="flex size-16 shrink-0 items-center justify-center rounded-lg bg-neutral-200 sm:size-20 dark:bg-neutral-800"
-      >
-        <UIcon class="size-8 text-neutral-400" name="i-lucide-music" />
-      </div>
+    <div
+      v-else-if="data?.track"
+      class="shimmer-gold overflow-hidden rounded-2xl bg-neutral-600 p-4"
+    >
+      <p class="mb-3 text-xs uppercase tracking-widest text-neutral-200">
+        Gerade läuft
+      </p>
 
-      <div class="min-w-0 flex-1">
-        <p class="truncate text-lg font-semibold">
-          {{ data.track.title }}
-        </p>
-        <p class="truncate text-sm text-neutral-500 dark:text-neutral-400">
-          {{ data.track.artist }}
-        </p>
-
-        <div v-if="data.isPlaying" class="mt-2 space-y-1">
-          <UProgress :model-value="progressPercent" :max="100" color="primary" size="xs" />
-          <div class="flex justify-between text-xs text-neutral-400">
-            <span>{{ formatTime(interpolatedProgress) }}</span>
-            <span>{{ formatTime(data.track.durationMs) }}</span>
-          </div>
+      <div class="flex items-center gap-4">
+        <img
+          v-if="data.track.coverUrl"
+          :alt="`${data.track.title} Cover`"
+          :src="data.track.coverUrl"
+          class="size-20 shrink-0 rounded-xl shadow-lg shadow-black/40"
+        >
+        <div
+          v-else
+          class="flex size-20 shrink-0 items-center justify-center rounded-xl bg-neutral-500"
+        >
+          <UIcon class="size-8 text-neutral-300" name="i-lucide-music" />
         </div>
 
-        <UBadge
-          v-if="!data.isPlaying"
-          class="mt-1"
-          color="neutral"
-          size="xs"
-          variant="subtle"
-        >
-          Pausiert
-        </UBadge>
+        <div class="min-w-0 flex-1">
+          <p class="truncate font-serif text-xl font-medium text-gold-200">
+            {{ data.track.title }}
+          </p>
+          <p class="mt-0.5 truncate text-sm text-neutral-200">
+            {{ data.track.artist }}
+          </p>
+
+          <div v-if="data.isPlaying" class="mt-3 space-y-1">
+            <UProgress :model-value="progressPercent" :max="100" color="primary" size="xs" />
+            <div class="flex justify-between text-xs text-neutral-300">
+              <span>{{ formatTime(interpolatedProgress) }}</span>
+              <span>{{ formatTime(data.track.durationMs) }}</span>
+            </div>
+          </div>
+
+          <span
+            v-if="!data.isPlaying"
+            class="mt-2 inline-block rounded-full bg-neutral-500 px-2.5 py-0.5 text-xs text-neutral-100"
+          >
+            Pausiert
+          </span>
+        </div>
       </div>
     </div>
 
     <div
       v-else
-      class="py-4 text-center text-sm text-neutral-400"
+      class="rounded-2xl bg-neutral-600 py-8 text-center text-sm text-neutral-300"
     >
       Kein Song wird gerade abgespielt
     </div>

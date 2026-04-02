@@ -15,21 +15,29 @@ async function handleSubmit(track: (typeof results.value)[0]) {
 
 <template>
   <div class="space-y-4">
-    <UInput
-      v-model="query"
-      :loading="isSearching"
-      autocomplete="off"
-      icon="i-lucide-search"
-      placeholder="Song suchen..."
-      size="lg"
-    />
+    <div class="ghost-border overflow-hidden rounded-2xl bg-neutral-500 transition-colors focus-within:bg-neutral-400">
+      <UInput
+        v-model="query"
+        :loading="isSearching"
+        autocomplete="off"
+        class="w-full"
+        icon="i-lucide-search"
+        placeholder="Song suchen..."
+        size="lg"
+        variant="none"
+      />
+    </div>
 
-    <UInput
-      v-model="guestName"
-      icon="i-lucide-user"
-      placeholder="Dein Name (optional)"
-      size="md"
-    />
+    <div class="ghost-border overflow-hidden rounded-2xl bg-neutral-500 transition-colors focus-within:bg-neutral-400">
+      <UInput
+        v-model="guestName"
+        class="w-full"
+        icon="i-lucide-user"
+        placeholder="Dein Name (optional)"
+        size="md"
+        variant="none"
+      />
+    </div>
 
     <UAlert
       v-if="error"
@@ -42,40 +50,37 @@ async function handleSubmit(track: (typeof results.value)[0]) {
       <div
         v-for="track in results"
         :key="track.id"
-        class="flex items-center gap-3 rounded-lg border border-neutral-200 p-3 transition-colors hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-900"
+        class="flex items-center gap-3 rounded-xl bg-neutral-600 p-3 transition-colors hover:bg-neutral-500"
       >
         <img
           v-if="track.coverUrl"
           :alt="`${track.title} Cover`"
           :src="track.coverUrl"
-          class="size-12 shrink-0 rounded"
+          class="size-12 shrink-0 rounded-lg"
         >
         <div
           v-else
-          class="flex size-12 shrink-0 items-center justify-center rounded bg-neutral-200 dark:bg-neutral-800"
+          class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-neutral-500"
         >
-          <UIcon class="size-5 text-neutral-400" name="i-lucide-music" />
+          <UIcon class="size-5 text-neutral-300" name="i-lucide-music" />
         </div>
 
         <div class="min-w-0 flex-1">
-          <p class="truncate font-medium">
+          <p class="truncate font-medium text-neutral-50">
             {{ track.title }}
           </p>
-          <p class="truncate text-sm text-neutral-500 dark:text-neutral-400">
+          <p class="truncate text-sm text-neutral-200">
             {{ track.artist }}
           </p>
-          <p class="truncate text-xs text-neutral-400">
+          <p class="truncate text-xs text-neutral-300">
             {{ track.album }}
           </p>
-          <UBadge
+          <span
             v-if="track.explicit"
-            class="mt-1"
-            color="warning"
-            size="xs"
-            variant="subtle"
+            class="mt-1 inline-block rounded bg-gold-900 px-1.5 py-0.5 text-xs text-gold-300"
           >
-            Explicit
-          </UBadge>
+            E
+          </span>
         </div>
 
         <UButton
@@ -93,7 +98,7 @@ async function handleSubmit(track: (typeof results.value)[0]) {
 
     <p
       v-else-if="query.length >= 2 && !isSearching && !error"
-      class="py-4 text-center text-sm text-neutral-400"
+      class="py-6 text-center text-sm text-neutral-300"
     >
       Keine Ergebnisse gefunden
     </p>

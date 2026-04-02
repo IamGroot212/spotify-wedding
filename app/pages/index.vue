@@ -14,6 +14,9 @@ function onSubmitted() {
 
 <template>
   <div class="relative mx-auto flex min-h-svh max-w-[390px] flex-col overflow-x-hidden">
+    <!-- Welcome Splash -->
+    <GuestWelcomeSplash @enter="() => {}" />
+
     <!-- Header -->
     <header class="sticky top-0 z-50 flex items-center gap-2 bg-[#141312] px-6 py-4">
       <UIcon class="size-5 text-gold-200" name="i-lucide-music-2" />

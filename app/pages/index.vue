@@ -18,7 +18,7 @@ function onSubmitted() {
     <GuestWelcomeSplash @enter="() => {}" />
 
     <!-- Header -->
-    <header class="flex shrink-0 items-center gap-2 px-6 py-3">
+    <header class="flex shrink-0 items-center justify-center gap-2 px-6 py-3">
       <UIcon class="size-5 text-gold-200" name="i-lucide-music-2" />
       <h1 class="font-serif text-xl italic tracking-tight text-gold-200">
         The Midnight Concierge

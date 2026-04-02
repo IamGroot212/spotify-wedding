@@ -3,9 +3,17 @@ const emit = defineEmits<{
   enter: [];
 }>();
 
-const visible = ref(true);
+const visible = ref(false);
+
+onMounted(() => {
+  const seen = localStorage.getItem('splash_seen');
+  if (!seen) {
+    visible.value = true;
+  }
+});
 
 function handleEnter() {
+  localStorage.setItem('splash_seen', '1');
   visible.value = false;
   emit('enter');
 }

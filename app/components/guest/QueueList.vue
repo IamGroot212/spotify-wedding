@@ -18,7 +18,7 @@ function itemOpacity(index: number): string {
 <template>
   <div>
     <!-- Skeleton -->
-    <div v-if="isLoading && !queue.length" class="space-y-6">
+    <div v-if="isLoading && !queue.length" class="space-y-3">
       <div v-for="i in 3" :key="i" class="flex animate-pulse items-center gap-4">
         <div class="size-12 rounded-lg bg-neutral-500" />
         <div class="flex-1 space-y-2">
@@ -29,7 +29,7 @@ function itemOpacity(index: number): string {
     </div>
 
     <!-- Queue -->
-    <div v-else-if="queue.length" class="max-h-96 space-y-6 overflow-y-auto">
+    <div v-else-if="queue.length" class="space-y-3">
       <div
         v-for="(track, index) in queue"
         :key="`${track.id}-${index}`"

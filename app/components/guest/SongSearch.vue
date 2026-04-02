@@ -37,7 +37,7 @@ async function handleSubmit(track: (typeof results.value)[0]) {
       </div>
       <input
         v-model="guestName"
-        class="w-full rounded-xl border-none bg-neutral-500 py-3 pl-12 pr-4 text-sm text-neutral-50 transition-all placeholder:text-neutral-200/40 focus:bg-neutral-400 focus:ring-1 focus:ring-gold-300/20"
+        class="w-full rounded-xl border-none bg-neutral-500 py-3 pl-12 pr-4 text-base text-neutral-50 transition-all placeholder:text-neutral-200/40 focus:bg-neutral-400 focus:ring-1 focus:ring-gold-300/20"
         placeholder="Dein Name (optional)"
         type="text"
       >

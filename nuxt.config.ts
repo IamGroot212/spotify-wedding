@@ -21,6 +21,9 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'de' },
+      meta: [
+        { content: 'width=device-width, initial-scale=1, maximum-scale=1', name: 'viewport' },
+      ],
       title: 'Spotify Wedding',
     },
   },

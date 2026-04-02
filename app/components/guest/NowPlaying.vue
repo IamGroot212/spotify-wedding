@@ -55,9 +55,9 @@ function formatTime(ms: number): string {
 
     <template v-else-if="data?.track">
       <!-- Ambient Glow -->
-      <div class="ambient-glow pointer-events-none absolute -top-10 left-1/2 size-80 -translate-x-1/2" />
+      <div class="ambient-glow pointer-events-none absolute -top-8 left-1/2 size-64 -translate-x-1/2" />
 
-      <div class="relative z-10 w-[280px]">
+      <div class="relative z-10 w-[200px]">
         <!-- Album Art -->
         <div class="aspect-square w-full overflow-hidden rounded-xl shadow-2xl">
           <img
@@ -75,7 +75,7 @@ function formatTime(ms: number): string {
         </div>
 
         <!-- Progress Bar -->
-        <div class="mt-8 w-full">
+        <div class="mt-4 w-full">
           <div class="h-[2px] w-full overflow-hidden rounded-full bg-neutral-300">
             <div
               class="h-full bg-gold-300 transition-[width] duration-500"
@@ -93,8 +93,8 @@ function formatTime(ms: number): string {
         </div>
 
         <!-- Song Info -->
-        <div class="mt-6 text-center">
-          <h2 class="font-serif text-2xl italic leading-tight text-gold-200">
+        <div class="mt-3 text-center">
+          <h2 class="font-serif text-xl italic leading-tight text-gold-200">
             {{ data.track.title }}
           </h2>
           <p class="mt-1 text-sm text-neutral-200">
@@ -113,7 +113,7 @@ function formatTime(ms: number): string {
     <!-- Empty State -->
     <div
       v-else
-      class="flex flex-col items-center py-12 text-center"
+      class="flex flex-col items-center py-6 text-center"
     >
       <div class="mb-4 flex size-16 items-center justify-center rounded-full bg-neutral-600">
         <UIcon class="size-8 text-gold-300/30" name="i-lucide-music" />

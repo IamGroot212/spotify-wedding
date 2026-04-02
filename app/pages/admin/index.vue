@@ -17,6 +17,23 @@ onMounted(() => {
 });
 
 const { data: nowPlaying } = useNowPlaying();
+
+const { data: stats, refresh: refreshStats } = useFetch<{
+  pending: number;
+  queued: number;
+  rejected: number;
+  total: number;
+}>('/api/admin/stats', { server: false });
+
+// Poll stats alongside request list
+const statsInterval = ref<ReturnType<typeof setInterval>>();
+onMounted(() => {
+  statsInterval.value = setInterval(refreshStats, 5000);
+});
+onUnmounted(() => {
+  if (statsInterval.value)
+    clearInterval(statsInterval.value);
+});
 </script>
 
 <template>
@@ -37,6 +54,34 @@ const { data: nowPlaying } = useNowPlaying();
       </header>
 
       <div class="mx-auto max-w-5xl px-6 py-4">
+        <!-- Stats -->
+        <div v-if="stats" class="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div class="rounded-2xl border border-white/5 bg-[#1d1b1a] p-4">
+            <span class="text-[10px] uppercase tracking-widest text-gold-300/40">Gesamt</span>
+            <p class="mt-1 font-serif text-3xl italic text-neutral-50">
+              {{ stats.total }}
+            </p>
+          </div>
+          <div class="rounded-2xl border border-gold-300/10 bg-neutral-500 p-4">
+            <span class="text-[10px] uppercase tracking-widest text-gold-300/40">Ausstehend</span>
+            <p class="mt-1 font-serif text-3xl italic text-gold-300">
+              {{ stats.pending }}
+            </p>
+          </div>
+          <div class="rounded-2xl border border-white/5 bg-[#1d1b1a] p-4">
+            <span class="text-[10px] uppercase tracking-widest text-gold-300/40">In Queue</span>
+            <p class="mt-1 font-serif text-3xl italic text-emerald-400">
+              {{ stats.queued }}
+            </p>
+          </div>
+          <div class="rounded-2xl border border-white/5 bg-[#1d1b1a] p-4">
+            <span class="text-[10px] uppercase tracking-widest text-gold-300/40">Abgelehnt</span>
+            <p class="mt-1 font-serif text-3xl italic text-[#ffb4ab]">
+              {{ stats.rejected }}
+            </p>
+          </div>
+        </div>
+
         <!-- Now Playing (compact) -->
         <div class="mb-6 flex items-center gap-4 rounded-2xl bg-[#1d1b1a] p-4">
           <img

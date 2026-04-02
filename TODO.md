@@ -22,11 +22,11 @@
 
 ## UX / Design
 
-- [ ] UI mit Stitch-Prototyp abgleichen und aktualisieren (alle Screens)
+- [x] UI mit Stitch-Prototyp abgleichen und aktualisieren (alle Screens)
 - [ ] Stitch-Funktionalitäten aus Prototyp übernehmen
 - [ ] Toast/Feedback nach Songvorschlag verbessern (Animation)
-- [ ] Dark Mode fest erzwingen (kein Toggle, immer Midnight Concierge)
-- [ ] Admin-UI an Midnight Concierge Design anpassen
+- [x] Dark Mode fest erzwingen (immer Midnight Concierge)
+- [x] Admin-UI an Midnight Concierge Design anpassen
 
 ## Nice to Have
 

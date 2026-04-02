@@ -6,6 +6,7 @@ export const songRequests = sqliteTable('song_requests', {
   artist: text('artist').notNull(),
   coverUrl: text('cover_url'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  guestSessionId: text('guest_session_id'),
   id: integer('id').primaryKey({ autoIncrement: true }),
   requestedBy: text('requested_by'),
   spotifyTrackId: text('spotify_track_id').notNull(),

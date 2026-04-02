@@ -36,6 +36,14 @@ export default defineNitroPlugin(async () => {
     INSERT OR IGNORE INTO app_settings (id) VALUES (1);
   `);
 
+  // Add guest_session_id column if missing (migration)
+  try {
+    sqlite.exec(`ALTER TABLE song_requests ADD COLUMN guest_session_id TEXT`);
+  }
+  catch {
+    // Column already exists
+  }
+
   // eslint-disable-next-line no-console
   console.log('[spotify-wedding] Database initialized');
 });

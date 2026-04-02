@@ -4,6 +4,7 @@ export function useSongRequest() {
   const isSubmitting = ref(false);
   const lastResult = ref<{ message: string; success: boolean } | null>(null);
   const toast = useToast();
+  const { sessionId } = useGuestSession();
 
   async function submitRequest(track: SearchResult, requestedBy?: string) {
     isSubmitting.value = true;
@@ -15,6 +16,7 @@ export function useSongRequest() {
           album: track.album,
           artist: track.artist,
           coverUrl: track.coverUrl,
+          guestSessionId: sessionId.value || undefined,
           requestedBy: requestedBy || undefined,
           spotifyTrackId: track.id,
           spotifyUri: track.uri,

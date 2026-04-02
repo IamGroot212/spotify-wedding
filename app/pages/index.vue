@@ -82,6 +82,9 @@ function onSubmitted() {
             :is-loading="queueLoading"
             :queue="queueData?.queue || []"
           />
+          <div class="mt-6">
+            <GuestMyRequests />
+          </div>
         </div>
       </section>
     </main>

@@ -17,13 +17,16 @@
 ## Architektur-Entscheidungen offen
 
 ### Queue-Scheduler (Diskussion nötig vor Umsetzung)
+
 Songs sollen nicht alle sofort in die Spotify-Queue, sondern getaktet eingefügt werden.
 Mögliche Ansätze:
+
 - **A) Einzeln getaktet**: Server-Worker prüft Playback-Status, fügt nächsten approved Song erst ein wenn Queue leer wird. So spielt zwischen Requests immer mindestens ein Playlist-Track.
 - **B) Ratio-basiert**: Konfigurierbar z.B. "nach jedem Request 2 Playlist-Songs abwarten". Worker zählt gespielte Playlist-Tracks.
 - **C) Playlist-Takeover**: Eigene Playlist statt Queue nutzen, volle Kontrolle über Reihenfolge. Deutlich komplexer.
 
 Anforderungen:
+
 - [ ] Im Admin-UI aktivierbar/deaktivierbar (Toggle)
 - [ ] Wenn deaktiviert: Songs werden sofort zur Queue hinzugefügt (aktuelles Verhalten)
 - [ ] Wenn aktiviert: Scheduler managed das Timing
@@ -32,6 +35,7 @@ Anforderungen:
 ## Bekannte Probleme / Risiken
 
 ### 1. In-Memory Session Store
+
 Admin-Sessions (Login-Tokens) werden im RAM gespeichert, nicht in der DB. Wenn der
 Node-Prozess neustartet (z.B. durch `systemctl restart` beim Deploy via Pipeline),
 gehen alle aktiven Sessions verloren → Admin muss sich neu einloggen.
@@ -39,14 +43,17 @@ gehen alle aktiven Sessions verloren → Admin muss sich neu einloggen.
 **Fix**: Sessions in SQLite speichern statt im RAM. Dann überlebt ein Restart.
 
 ### 2. Spotify Token-Refresh
+
 Spotify Access-Tokens laufen nach **1 Stunde** ab. Der Code macht automatischen Refresh
 mit dem Refresh-Token (1 Minute vor Ablauf). Das funktioniert im Normalfall, aber:
+
 - Wenn der Pi genau während des Refresh offline ist → Token abgelaufen, kein Refresh möglich
 - Wenn Spotify den Refresh-Token widerruft (selten, aber möglich) → manuelles Reconnect nötig
 - **Risiko beim Event**: 4-6 Stunden Laufzeit = 4-6 Token-Refreshes. Jeder einzelne muss klappen.
 - **Empfehlung**: Vor dem Event 2-3 Stunden laufen lassen und Logs prüfen ob Refresh sauber durchgeht.
 
 ### 3. Bereits gespielte Songs
+
 Aktuell: Duplikat-Check nur innerhalb `duplicateWindowMinutes` (default 60 Min).
 Danach kann derselbe Song erneut angefragt werden.
 **Lösung**: Zusätzlicher Toggle "Keine Wiederholungen am ganzen Abend" — prüft gegen alle
@@ -54,6 +61,7 @@ Songs mit Status `queued` oder `played`, nicht nur innerhalb Zeitfenster.
 Im Admin deaktivierbar für den Fall dass ein Song bewusst nochmal gespielt werden soll.
 
 ### 4. Rate-Limiting per IP vs. Session
+
 Aktuell: Rate-Limit per IP-Adresse (5 Requests/Minute).
 **Problem**: Im Hochzeits-WLAN haben alle Gäste dieselbe öffentliche IP → ein Gast der
 schnell tippt blockiert alle anderen.

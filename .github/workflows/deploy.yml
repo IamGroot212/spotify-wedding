@@ -47,3 +47,6 @@ jobs:
 
       - name: API tests
         run: pnpm test
+
+      - name: Cleanup test data
+        run: node /home/febec/Programming/claude/spotify-wedding/scripts/cleanup-test-data.mjs

@@ -65,6 +65,11 @@ body {
   animation: shimmer 4s ease-in-out infinite;
 }
 
+/* Ambient gold glow behind album art */
+.ambient-glow {
+  background: radial-gradient(circle at center, rgba(232, 201, 126, 0.15) 0%, rgba(20, 19, 18, 0) 70%);
+}
+
 /* Glassmorphism utility */
 .glass {
   background: rgba(33, 31, 30, 0.7);

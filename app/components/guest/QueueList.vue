@@ -5,50 +5,68 @@ defineProps<{
   isLoading: boolean;
   queue: TrackInfo[];
 }>();
+
+function itemOpacity(index: number): string {
+  if (index <= 1)
+    return 'opacity-100';
+  if (index <= 3)
+    return 'opacity-80';
+  return 'opacity-60';
+}
 </script>
 
 <template>
   <div>
-    <div v-if="isLoading && !queue.length" class="space-y-3">
-      <USkeleton v-for="i in 3" :key="i" class="h-14 w-full rounded-xl" />
+    <!-- Skeleton -->
+    <div v-if="isLoading && !queue.length" class="space-y-6">
+      <div v-for="i in 3" :key="i" class="flex animate-pulse items-center gap-4">
+        <div class="size-12 rounded-lg bg-neutral-500" />
+        <div class="flex-1 space-y-2">
+          <div class="h-4 w-3/4 rounded bg-neutral-500" />
+          <div class="h-3 w-1/2 rounded bg-neutral-500" />
+        </div>
+      </div>
     </div>
 
-    <ul v-else-if="queue.length" class="max-h-96 space-y-1 overflow-y-auto">
-      <li
+    <!-- Queue -->
+    <div v-else-if="queue.length" class="max-h-96 space-y-6 overflow-y-auto">
+      <div
         v-for="(track, index) in queue"
         :key="`${track.id}-${index}`"
-        class="flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-neutral-600"
+        :class="itemOpacity(index)"
+        class="flex items-center gap-4"
       >
-        <span class="w-5 shrink-0 text-center text-xs tabular-nums text-neutral-300">
-          {{ index + 1 }}
-        </span>
-
-        <img
-          v-if="track.coverUrl"
-          :alt="`${track.title} Cover`"
-          :src="track.coverUrl"
-          class="size-10 shrink-0 rounded-lg"
-        >
-        <div
-          v-else
-          class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-neutral-500"
-        >
-          <UIcon class="size-4 text-neutral-300" name="i-lucide-music" />
+        <div class="size-12 shrink-0 overflow-hidden rounded-lg">
+          <img
+            v-if="track.coverUrl"
+            :alt="`${track.title} Cover`"
+            :src="track.coverUrl"
+            class="size-full object-cover"
+          >
+          <div v-else class="flex size-full items-center justify-center bg-neutral-500">
+            <UIcon class="size-4 text-neutral-300" name="i-lucide-music" />
+          </div>
         </div>
 
         <div class="min-w-0 flex-1">
-          <p class="truncate text-sm font-medium text-neutral-50">
+          <h4 class="truncate text-sm font-medium text-neutral-50">
             {{ track.title }}
-          </p>
-          <p class="truncate text-xs text-neutral-300">
+          </h4>
+          <p class="truncate text-xs text-neutral-200">
             {{ track.artist }}
           </p>
         </div>
-      </li>
-    </ul>
+      </div>
+    </div>
 
-    <p v-else class="py-8 text-center text-sm text-neutral-300">
-      Keine Songs in der Warteschlange
-    </p>
+    <!-- Empty State -->
+    <div v-else class="flex flex-col items-center justify-center py-12 text-center">
+      <div class="mb-4 flex size-16 items-center justify-center rounded-full bg-neutral-600">
+        <UIcon class="size-8 text-gold-300/30" name="i-lucide-list-music" />
+      </div>
+      <p class="px-8 text-sm leading-relaxed text-neutral-200">
+        Noch keine Songs in der Queue — sei der Erste!
+      </p>
+    </div>
   </div>
 </template>

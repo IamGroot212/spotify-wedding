@@ -2,10 +2,10 @@
 
 ## Kritisch (vor Hochzeit)
 
-- [ ] Production-DB: separate SQLite-Datei für Produktion (nicht die Dev-DB)
-- [ ] Admin-Passwort: sicheres Passwort setzen (nicht "admin")
+- [x] Production-DB: separate SQLite-Datei für Produktion (`production.sqlite`)
+- [x] Admin-Passwort: sicheres Passwort gesetzt
 - [ ] Spotify Redirect URI: nur `https://camavor.de/...` in Spotify Dashboard, Dev-URIs entfernen
-- [ ] GitHub Actions CI/CD: Pi als Self-Hosted Runner, Auto-Deploy auf Push to main
+- [x] GitHub Actions CI/CD: Pi als Self-Hosted Runner, Auto-Deploy auf Push to main
 - [ ] Tests: API-Tests (Vitest) für alle Server-Endpunkte
 - [ ] Tests: E2E-Tests (Playwright) — Guest-Flow + Admin-Flow
 - [ ] SSR-Fix prüfen: aktuell SPA-Mode wegen Node 22 Vue-Bug — ggf. mit Node 20 testen
@@ -37,8 +37,8 @@
 
 ## Ops / Deployment
 
-- [ ] GitHub Actions Runner auf Pi einrichten
-- [ ] Deploy-Workflow: pnpm install → build → systemctl restart
+- [x] GitHub Actions Runner auf Pi einrichten
+- [x] Deploy-Workflow: pnpm install → build → systemctl restart
 - [ ] .env.production pflegen (getrennt von .env für Dev)
 - [ ] Monitoring: systemd Journal + einfacher Health-Check
 - [ ] Backup-Strategie für SQLite-DB (vor dem Event)

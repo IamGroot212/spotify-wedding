@@ -43,68 +43,84 @@ function formatTime(ms: number): string {
 </script>
 
 <template>
-  <div>
+  <section class="relative flex flex-col items-center">
     <UAlert
       v-if="!isConnected"
+      class="w-full"
       color="warning"
       description="Spotify ist nicht verbunden."
       icon="i-lucide-wifi-off"
       title="Keine Verbindung"
     />
 
-    <div
-      v-else-if="data?.track"
-      class="shimmer-gold overflow-hidden rounded-2xl bg-neutral-600 p-4"
-    >
-      <p class="mb-3 text-xs uppercase tracking-widest text-neutral-200">
-        Gerade läuft
-      </p>
+    <template v-else-if="data?.track">
+      <!-- Ambient Glow -->
+      <div class="ambient-glow pointer-events-none absolute -top-10 left-1/2 size-80 -translate-x-1/2" />
 
-      <div class="flex items-center gap-4">
-        <img
-          v-if="data.track.coverUrl"
-          :alt="`${data.track.title} Cover`"
-          :src="data.track.coverUrl"
-          class="size-20 shrink-0 rounded-xl shadow-lg shadow-black/40"
-        >
-        <div
-          v-else
-          class="flex size-20 shrink-0 items-center justify-center rounded-xl bg-neutral-500"
-        >
-          <UIcon class="size-8 text-neutral-300" name="i-lucide-music" />
+      <div class="relative z-10 w-[280px]">
+        <!-- Album Art -->
+        <div class="aspect-square w-full overflow-hidden rounded-xl shadow-2xl">
+          <img
+            v-if="data.track.coverUrl"
+            :alt="`${data.track.title} Cover`"
+            :src="data.track.coverUrl"
+            class="size-full object-cover"
+          >
+          <div
+            v-else
+            class="flex size-full items-center justify-center bg-neutral-600"
+          >
+            <UIcon class="size-16 text-neutral-300" name="i-lucide-music" />
+          </div>
         </div>
 
-        <div class="min-w-0 flex-1">
-          <p class="truncate font-serif text-xl font-medium text-gold-200">
+        <!-- Progress Bar -->
+        <div class="mt-8 w-full">
+          <div class="h-[2px] w-full overflow-hidden rounded-full bg-neutral-300">
+            <div
+              class="h-full bg-gold-300 transition-[width] duration-500"
+              :style="{ width: `${progressPercent}%` }"
+            />
+          </div>
+          <div class="mt-2 flex justify-between">
+            <span class="text-[10px] uppercase tracking-wider text-neutral-200">
+              {{ formatTime(interpolatedProgress) }}
+            </span>
+            <span class="text-[10px] uppercase tracking-wider text-neutral-200">
+              {{ formatTime(data.track.durationMs) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Song Info -->
+        <div class="mt-6 text-center">
+          <h2 class="font-serif text-2xl italic leading-tight text-gold-200">
             {{ data.track.title }}
-          </p>
-          <p class="mt-0.5 truncate text-sm text-neutral-200">
+          </h2>
+          <p class="mt-1 text-sm text-neutral-200">
             {{ data.track.artist }}
           </p>
-
-          <div v-if="data.isPlaying" class="mt-3 space-y-1">
-            <UProgress :model-value="progressPercent" :max="100" color="primary" size="xs" />
-            <div class="flex justify-between text-xs text-neutral-300">
-              <span>{{ formatTime(interpolatedProgress) }}</span>
-              <span>{{ formatTime(data.track.durationMs) }}</span>
-            </div>
-          </div>
-
           <span
             v-if="!data.isPlaying"
-            class="mt-2 inline-block rounded-full bg-neutral-500 px-2.5 py-0.5 text-xs text-neutral-100"
+            class="mt-2 inline-block text-[10px] uppercase tracking-widest text-neutral-300/60"
           >
             Pausiert
           </span>
         </div>
       </div>
-    </div>
+    </template>
 
+    <!-- Empty State -->
     <div
       v-else
-      class="rounded-2xl bg-neutral-600 py-8 text-center text-sm text-neutral-300"
+      class="flex flex-col items-center py-12 text-center"
     >
-      Kein Song wird gerade abgespielt
+      <div class="mb-4 flex size-16 items-center justify-center rounded-full bg-neutral-600">
+        <UIcon class="size-8 text-gold-300/30" name="i-lucide-music" />
+      </div>
+      <p class="px-8 text-sm leading-relaxed text-neutral-200">
+        Kein Song wird gerade abgespielt
+      </p>
     </div>
-  </div>
+  </section>
 </template>

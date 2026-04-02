@@ -14,11 +14,11 @@
 
 - [x] QR-Code Seite: `/qr` Route mit druckbarem QR-Code zu camavor.de
 - [x] Splash/Welcome Screen: "The Midnight Concierge" Landing
-- [ ] Gast-Queue-Status: Gäste sehen ob ihr Vorschlag angenommen/abgelehnt wurde (via Session-ID)
-- [ ] Admin: Live-Counter (eingegangen / genehmigt / abgelehnt / in Queue)
+- [x] Gast-Queue-Status: Gäste sehen Vorschlag-Status via Session-ID
+- [x] Admin: Live-Counter (Gesamt / Ausstehend / In Queue / Abgelehnt)
 - [ ] Admin: Bulk Actions (mehrere Requests auf einmal annehmen/ablehnen)
 - [ ] Admin: Blocklist (Songs/Artisten sperren)
-- [ ] Offline-Fallback: "Bitte Geduld"-Screen wenn Spotify nicht erreichbar
+- [x] Offline-Fallback: Connection Banner + Fehler-States
 
 ## UX / Design
 

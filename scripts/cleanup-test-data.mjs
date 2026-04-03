@@ -1,10 +1,6 @@
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import Database from 'better-sqlite3';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const dbPath = process.env.NUXT_DATABASE_PATH || resolve(__dirname, '..', '.data', 'production.sqlite');
+const dbPath = process.env.NUXT_DATABASE_PATH || '/home/febec/Programming/claude/spotify-wedding/.data/production.sqlite';
 const db = new Database(dbPath);
 
 const result = db.prepare(`DELETE FROM song_requests`).run();

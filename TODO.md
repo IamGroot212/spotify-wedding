@@ -32,6 +32,24 @@ Anforderungen:
 - [ ] Wenn aktiviert: Scheduler managed das Timing
 - [ ] Konfigurierbare Ratio (wie viele Playlist-Songs zwischen Requests)
 
+### Pi System-Monitor (Entscheidung offen)
+CPU-Auslastung, Temperatur, RAM, Disk — live überwachen während dem Event.
+
+**Option A: Im Admin-Panel integriert** (`/admin/monitor`)
+- Pro: Kein extra Setup, gleicher Login, alles an einem Ort
+- Con: Belastet die Wedding-App, koppelt Monitoring an die App
+
+**Option B: Eigene App unter Subdomain** (`monitor.camavor.de`)
+- Pro: Unabhängig — läuft auch wenn die Wedding-App Probleme hat
+- Pro: Wiederverwendbar für andere Projekte auf dem Pi
+- Pro: Kann auch andere Services überwachen (Postgres, Spotify-Connect Container etc.)
+- Con: Extra Setup (eigener Port, Cloudflare-Tunnel-Route)
+
+**Empfehlung: Option B** — ein eigenständiger Mini-Monitor ist robuster und
+nützlicher langfristig. Kann minimalistisch sein (Node.js, liest `/proc/` und
+`vcgencmd measure_temp`, liefert JSON + simple UI). Oder ein fertiges Tool
+wie `glances` (Web-UI auf Port 61208, nur Tunnel-Route hinzufügen).
+
 ## Bekannte Probleme / Risiken
 
 ### 1. In-Memory Session Store
@@ -103,5 +121,6 @@ neu eingegeben werden muss.
 - [x] Deploy-Workflow: pnpm install → build → systemctl restart
 - [ ] .env.production pflegen (getrennt von .env für Dev)
 - [ ] Monitoring: systemd Journal + einfacher Health-Check
+- [ ] Pi System-Monitor (CPU, Temperatur, RAM, Disk) — siehe Entscheidung unten
 - [ ] Backup-Strategie für SQLite-DB (vor dem Event)
 - [ ] Admin-Sessions in SQLite statt RAM (überlebt Restarts)

@@ -1,7 +1,7 @@
-import Database from 'better-sqlite3';
-
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import Database from 'better-sqlite3';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dbPath = process.env.NUXT_DATABASE_PATH || resolve(__dirname, '..', '.data', 'production.sqlite');

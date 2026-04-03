@@ -33,13 +33,16 @@ Anforderungen:
 - [ ] Konfigurierbare Ratio (wie viele Playlist-Songs zwischen Requests)
 
 ### Pi System-Monitor (Entscheidung offen)
+
 CPU-Auslastung, Temperatur, RAM, Disk — live überwachen während dem Event.
 
 **Option A: Im Admin-Panel integriert** (`/admin/monitor`)
+
 - Pro: Kein extra Setup, gleicher Login, alles an einem Ort
 - Con: Belastet die Wedding-App, koppelt Monitoring an die App
 
 **Option B: Eigene App unter Subdomain** (`monitor.camavor.de`)
+
 - Pro: Unabhängig — läuft auch wenn die Wedding-App Probleme hat
 - Pro: Wiederverwendbar für andere Projekte auf dem Pi
 - Pro: Kann auch andere Services überwachen (Postgres, Spotify-Connect Container etc.)

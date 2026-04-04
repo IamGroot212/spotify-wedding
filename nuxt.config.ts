@@ -47,7 +47,13 @@ export default defineNuxtConfig({
     },
   },
 
-  ssr: false,
+  ssr: true,
+
+  vite: {
+    ssr: {
+      noExternal: ['vue'],
+    },
+  },
 
   nitro: {
     preset: 'node-server',

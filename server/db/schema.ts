@@ -29,5 +29,6 @@ export const appSettings = sqliteTable('app_settings', {
   explicitFilterEnabled: integer('explicit_filter_enabled', { mode: 'boolean' }).notNull().default(false),
   id: integer('id').primaryKey().default(1),
   maxRequestsPerGuest: integer('max_requests_per_guest').notNull().default(10),
+  noRepeatsAllNight: integer('no_repeats_all_night', { mode: 'boolean' }).notNull().default(true),
   requireApproval: integer('require_approval', { mode: 'boolean' }).notNull().default(true),
 });

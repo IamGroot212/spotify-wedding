@@ -36,12 +36,14 @@ export default defineNitroPlugin(async () => {
     INSERT OR IGNORE INTO app_settings (id) VALUES (1);
   `);
 
-  // Add guest_session_id column if missing (migration)
-  try {
-    sqlite.exec(`ALTER TABLE song_requests ADD COLUMN guest_session_id TEXT`);
-  }
-  catch {
-    // Column already exists
+  // Migrations: add columns if missing
+  const migrations = [
+    `ALTER TABLE song_requests ADD COLUMN guest_session_id TEXT`,
+    `ALTER TABLE app_settings ADD COLUMN no_repeats_all_night INTEGER NOT NULL DEFAULT 1`,
+  ];
+  for (const sql of migrations) {
+    try { sqlite.exec(sql); }
+    catch { /* column already exists */ }
   }
 
   // eslint-disable-next-line no-console

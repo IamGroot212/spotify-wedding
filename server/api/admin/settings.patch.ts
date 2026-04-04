@@ -6,6 +6,7 @@ const bodySchema = z.object({
   duplicateWindowMinutes: z.number().int().min(0).max(1440).optional(),
   explicitFilterEnabled: z.boolean().optional(),
   maxRequestsPerGuest: z.number().int().min(1).max(100).optional(),
+  noRepeatsAllNight: z.boolean().optional(),
   requireApproval: z.boolean().optional(),
 });
 

@@ -1,4 +1,4 @@
-import { and, eq, gte } from 'drizzle-orm';
+import { and, eq, gte, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 
 const requestSchema = z.object({
@@ -17,22 +17,40 @@ export default defineEventHandler(async (event) => {
 
   // Load settings
   const settings = await db.query.appSettings.findFirst();
-  const duplicateWindow = settings?.duplicateWindowMinutes ?? 60;
 
-  // Check for duplicates within window
-  const windowStart = new Date(Date.now() - duplicateWindow * 60 * 1000);
-  const existing = await db.query.songRequests.findFirst({
-    where: and(
-      eq(schema.songRequests.spotifyTrackId, body.spotifyTrackId),
-      gte(schema.songRequests.createdAt, windowStart),
-    ),
-  });
-
-  if (existing) {
-    throw createError({
-      message: 'Dieser Song wurde bereits vorgeschlagen.',
-      statusCode: 409,
+  // Check "no repeats all night" — block songs already queued/played
+  if (settings?.noRepeatsAllNight) {
+    const alreadyPlayed = await db.query.songRequests.findFirst({
+      where: and(
+        eq(schema.songRequests.spotifyTrackId, body.spotifyTrackId),
+        inArray(schema.songRequests.status, ['queued', 'played', 'pending', 'approved']),
+      ),
     });
+
+    if (alreadyPlayed) {
+      throw createError({
+        message: 'Dieser Song wurde heute Abend bereits vorgeschlagen.',
+        statusCode: 409,
+      });
+    }
+  }
+  else {
+    // Fallback: duplicate check within time window
+    const duplicateWindow = settings?.duplicateWindowMinutes ?? 60;
+    const windowStart = new Date(Date.now() - duplicateWindow * 60 * 1000);
+    const existing = await db.query.songRequests.findFirst({
+      where: and(
+        eq(schema.songRequests.spotifyTrackId, body.spotifyTrackId),
+        gte(schema.songRequests.createdAt, windowStart),
+      ),
+    });
+
+    if (existing) {
+      throw createError({
+        message: 'Dieser Song wurde bereits vorgeschlagen.',
+        statusCode: 409,
+      });
+    }
   }
 
   // Check explicit filter

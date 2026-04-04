@@ -17,19 +17,6 @@ async function handleSubmit(track: (typeof results.value)[0]) {
 
 <template>
   <div class="space-y-6">
-    <!-- Search Input -->
-    <div class="relative">
-      <div class="pointer-events-none absolute inset-y-0 left-4 flex items-center">
-        <UIcon class="size-5 text-neutral-200/60" name="i-lucide-search" />
-      </div>
-      <input
-        v-model="query"
-        class="w-full rounded-xl border-none bg-neutral-500 py-4 pl-12 pr-4 text-neutral-50 transition-all placeholder:text-neutral-200/40 focus:bg-neutral-400 focus:ring-1 focus:ring-gold-300/20"
-        placeholder="Song oder Interpret suchen..."
-        type="text"
-      >
-    </div>
-
     <!-- Guest Name -->
     <div class="relative">
       <div class="pointer-events-none absolute inset-y-0 left-4 flex items-center">
@@ -39,6 +26,19 @@ async function handleSubmit(track: (typeof results.value)[0]) {
         v-model="guestName"
         class="w-full rounded-xl border-none bg-neutral-500 py-3 pl-12 pr-4 text-base text-neutral-50 transition-all placeholder:text-neutral-200/40 focus:bg-neutral-400 focus:ring-1 focus:ring-gold-300/20"
         placeholder="Dein Name (optional)"
+        type="text"
+      >
+    </div>
+
+    <!-- Search Input -->
+    <div class="relative">
+      <div class="pointer-events-none absolute inset-y-0 left-4 flex items-center">
+        <UIcon class="size-5 text-neutral-200/60" name="i-lucide-search" />
+      </div>
+      <input
+        v-model="query"
+        class="w-full rounded-xl border-none bg-neutral-500 py-4 pl-12 pr-4 text-neutral-50 transition-all placeholder:text-neutral-200/40 focus:bg-neutral-400 focus:ring-1 focus:ring-gold-300/20"
+        placeholder="Song oder Interpret suchen..."
         type="text"
       >
     </div>

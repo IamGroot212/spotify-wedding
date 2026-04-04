@@ -90,6 +90,10 @@ schnell tippt blockiert alle anderen.
 Zusätzlich: eingegebener Gast-Name per localStorage speichern, damit er nicht jedes Mal
 neu eingegeben werden muss.
 
+## UX Fixes
+
+- [ ] Reihenfolge tauschen: Name-Eingabe nach oben, Songsuche darunter (Name zuerst, dann suchen)
+
 ## Funktional
 
 - [x] QR-Code Seite: `/qr` Route mit druckbarem QR-Code zu camavor.de

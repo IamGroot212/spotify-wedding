@@ -12,6 +12,9 @@ export function useSongRequest() {
 
     try {
       const data = await $fetch<{ message: string }>('/api/requests', {
+        headers: {
+          'x-guest-session': sessionId.value || '',
+        },
         body: {
           album: track.album,
           artist: track.artist,

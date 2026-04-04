@@ -7,6 +7,17 @@ const { isSubmitting, submitRequest } = useSongRequest();
 const guestName = ref('');
 const submittedTrackIds = ref(new Set<string>());
 
+onMounted(() => {
+  const saved = localStorage.getItem('guest_name');
+  if (saved)
+    guestName.value = saved;
+});
+
+watch(guestName, (name) => {
+  if (name)
+    localStorage.setItem('guest_name', name);
+});
+
 async function handleSubmit(track: (typeof results.value)[0]) {
   await submitRequest(track, guestName.value || undefined);
   submittedTrackIds.value.add(track.id);

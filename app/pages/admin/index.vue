@@ -4,6 +4,11 @@ definePageMeta({ middleware: 'admin' });
 const route = useRoute();
 const toast = useToast();
 
+async function handleLogout() {
+  await $fetch('/api/admin/logout', { method: 'POST' });
+  await navigateTo('/admin/login');
+}
+
 onMounted(() => {
   if (route.query.spotify === 'connected') {
     toast.add({ color: 'success', title: 'Spotify erfolgreich verbunden!' });
@@ -50,7 +55,16 @@ onUnmounted(() => {
             Songvorschläge verwalten
           </p>
         </div>
-        <AdminSpotifyStatus />
+        <div class="flex items-center gap-3">
+          <AdminSpotifyStatus />
+          <button
+            class="flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs text-neutral-200/60 transition-colors hover:bg-white/5 hover:text-neutral-200"
+            @click="handleLogout"
+          >
+            <UIcon class="size-4" name="i-lucide-log-out" />
+            Logout
+          </button>
+        </div>
       </header>
 
       <div class="mx-auto max-w-5xl px-6 py-4">

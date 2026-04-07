@@ -21,7 +21,7 @@ export function createAdminSession(event: H3Event): string {
     maxAge: 60 * 60 * 12, // 12 hours
     path: '/',
     sameSite: 'lax',
-    secure: false, // Raspberry Pi local network
+    secure: true,
   });
 
   return token;

@@ -7,8 +7,8 @@
 
 ## Offen — Architektur (Diskussion nötig)
 
-- [ ] Queue-Scheduler: getaktetes Einfügen statt sofort (deaktivierbar)
-- [ ] Pi System-Monitor (eigene App unter monitor.camavor.de)
+- [x] Queue-Scheduler: getaktetes Einfügen, Toggle in Settings
+- [x] Pi System-Monitor: /admin/monitor (CPU, Temp, RAM, Disk, Uptime)
 
 ## Offen — Ops
 

@@ -42,5 +42,6 @@ export const appSettings = sqliteTable('app_settings', {
   id: integer('id').primaryKey().default(1),
   maxRequestsPerGuest: integer('max_requests_per_guest').notNull().default(10),
   noRepeatsAllNight: integer('no_repeats_all_night', { mode: 'boolean' }).notNull().default(true),
+  queueSchedulerEnabled: integer('queue_scheduler_enabled', { mode: 'boolean' }).notNull().default(false),
   requireApproval: integer('require_approval', { mode: 'boolean' }).notNull().default(true),
 });

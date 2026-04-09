@@ -2,8 +2,8 @@
 
 ## Offen — Funktional
 
-- [ ] Admin: Blocklist (Songs/Artisten sperren)
-- [ ] Toast/Feedback nach Songvorschlag verbessern
+- [x] Admin: Blocklist (Songs/Artisten sperren)
+- [x] Toast/Feedback nach Songvorschlag verbessern
 
 ## Offen — Architektur (Diskussion nötig)
 

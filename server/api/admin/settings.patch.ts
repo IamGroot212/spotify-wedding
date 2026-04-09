@@ -7,6 +7,7 @@ const bodySchema = z.object({
   explicitFilterEnabled: z.boolean().optional(),
   maxRequestsPerGuest: z.number().int().min(1).max(100).optional(),
   noRepeatsAllNight: z.boolean().optional(),
+  queueSchedulerEnabled: z.boolean().optional(),
   requireApproval: z.boolean().optional(),
 });
 

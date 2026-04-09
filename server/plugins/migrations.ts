@@ -54,6 +54,7 @@ export default defineNitroPlugin(async () => {
   const migrations = [
     `ALTER TABLE song_requests ADD COLUMN guest_session_id TEXT`,
     `ALTER TABLE app_settings ADD COLUMN no_repeats_all_night INTEGER NOT NULL DEFAULT 1`,
+    `ALTER TABLE app_settings ADD COLUMN queue_scheduler_enabled INTEGER NOT NULL DEFAULT 0`,
   ];
   for (const migration of migrations) {
     try {

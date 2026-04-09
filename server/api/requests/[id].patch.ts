@@ -6,7 +6,6 @@ const bodySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  // Admin-only (enforced by middleware)
   if (!isAdminAuthenticated(event)) {
     throw createError({ message: 'Nicht autorisiert', statusCode: 401 });
   }
@@ -26,8 +25,25 @@ export default defineEventHandler(async (event) => {
     throw createError({ message: 'Vorschlag nicht gefunden', statusCode: 404 });
   }
 
-  // If approving and adding to queue
+  // Check if scheduler is enabled
+  const settings = await db.query.appSettings.findFirst();
+  const schedulerEnabled = settings?.queueSchedulerEnabled ?? false;
+
   if (body.status === 'queued') {
+    if (schedulerEnabled) {
+      // Scheduler mode: set to approved, scheduler will handle queue timing
+      await db.update(schema.songRequests)
+        .set({ status: 'approved' })
+        .where(eq(schema.songRequests.id, id));
+
+      const [updated] = await db.query.songRequests.findMany({
+        where: eq(schema.songRequests.id, id),
+      });
+
+      return { request: updated, scheduled: true };
+    }
+
+    // Direct mode: add to Spotify queue immediately
     try {
       await addToQueue(existing.spotifyUri);
     }

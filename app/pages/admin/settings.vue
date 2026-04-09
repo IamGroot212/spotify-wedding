@@ -7,6 +7,7 @@ type Settings = {
   explicitFilterEnabled: boolean;
   maxRequestsPerGuest: number;
   noRepeatsAllNight: boolean;
+  queueSchedulerEnabled: boolean;
   requireApproval: boolean;
 };
 
@@ -97,6 +98,13 @@ async function removeFromBlocklist(id: number) {
             label="Explicit-Filter"
             description="Songs mit expliziten Inhalten blockieren"
             @update:model-value="updateSetting('explicitFilterEnabled', $event)"
+          />
+
+          <USwitch
+            :model-value="data.settings.queueSchedulerEnabled"
+            label="Queue-Scheduler"
+            description="Songs getaktet einfügen — wartet bis Queue fast leer ist bevor der nächste Song hinzugefügt wird"
+            @update:model-value="updateSetting('queueSchedulerEnabled', $event)"
           />
         </div>
       </div>

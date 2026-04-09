@@ -59,7 +59,7 @@ async function updateSetting(key: keyof Settings, value: boolean | number) {
               @click="updateSetting('requireApproval', !data.settings.requireApproval)"
             >
               <span
-                :class="data.settings.requireApproval ? 'translate-x-5' : 'translate-x-0.5'"
+                :class="data.settings.requireApproval ? 'translate-x-[18px]' : 'translate-x-0.5'"
                 class="inline-block size-5 rounded-full bg-white shadow transition-transform"
               />
             </button>
@@ -80,7 +80,7 @@ async function updateSetting(key: keyof Settings, value: boolean | number) {
               @click="updateSetting('noRepeatsAllNight', !data.settings.noRepeatsAllNight)"
             >
               <span
-                :class="data.settings.noRepeatsAllNight ? 'translate-x-5' : 'translate-x-0.5'"
+                :class="data.settings.noRepeatsAllNight ? 'translate-x-[18px]' : 'translate-x-0.5'"
                 class="inline-block size-5 rounded-full bg-white shadow transition-transform"
               />
             </button>
@@ -101,7 +101,7 @@ async function updateSetting(key: keyof Settings, value: boolean | number) {
               @click="updateSetting('explicitFilterEnabled', !data.settings.explicitFilterEnabled)"
             >
               <span
-                :class="data.settings.explicitFilterEnabled ? 'translate-x-5' : 'translate-x-0.5'"
+                :class="data.settings.explicitFilterEnabled ? 'translate-x-[18px]' : 'translate-x-0.5'"
                 class="inline-block size-5 rounded-full bg-white shadow transition-transform"
               />
             </button>

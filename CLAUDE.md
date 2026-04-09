@@ -2,6 +2,25 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## CRITICAL: Deployment Safety
+
+Production runs on a Raspberry Pi with no remote access (DS-Lite, no SSH from outside).
+Changes can ONLY be deployed via Git push to `main` (GitHub Actions auto-deploys).
+
+**Rules for code changes:**
+- NEVER change `nuxt.config.ts` runtimeConfig keys or structure (would break env var mapping)
+- NEVER change the Nitro preset or SSR setting (would break the production build)
+- NEVER change database schema column names (would break existing data)
+- NEVER remove or rename API endpoints that the frontend depends on
+- Adding new files, components, pages, or API endpoints is SAFE
+- Changing UI/styling is SAFE
+- Adding new database columns via migrations is SAFE (additive only)
+- The pipeline cleanup script deletes ALL song_requests after tests — do NOT deploy during the event
+
+**If something breaks after a push:**
+- `git revert HEAD && git push` to undo the last commit
+- The previous build stays running until the new pipeline succeeds
+
 ## Project Overview
 
 **Spotify Wedding** — A private wedding song request web app. Guests scan a QR code, search for songs, and submit requests. The admin (groom/bride) moderates requests and controls the Spotify queue. Built on Nuxt 4 + Nuxt UI v4. German-language target (`lang="de"`).

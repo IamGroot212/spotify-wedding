@@ -42,6 +42,13 @@ export default defineNitroPlugin(async () => {
       token TEXT PRIMARY KEY,
       created_at INTEGER NOT NULL DEFAULT (unixepoch())
     );
+
+    CREATE TABLE IF NOT EXISTS blocklist (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      type TEXT NOT NULL CHECK (type IN ('track', 'artist')),
+      value TEXT NOT NULL,
+      created_at INTEGER NOT NULL DEFAULT (unixepoch())
+    );
   `);
 
   const migrations = [

@@ -28,6 +28,13 @@ export const adminSessions = sqliteTable('admin_sessions', {
   token: text('token').primaryKey(),
 });
 
+export const blocklist = sqliteTable('blocklist', {
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  type: text('type', { enum: ['track', 'artist'] }).notNull(),
+  value: text('value').notNull(), // spotify track ID or artist name (lowercase)
+});
+
 export const appSettings = sqliteTable('app_settings', {
   cooldownSeconds: integer('cooldown_seconds').notNull().default(30),
   duplicateWindowMinutes: integer('duplicate_window_minutes').notNull().default(60),

@@ -18,6 +18,33 @@ export default defineEventHandler(async (event) => {
   // Load settings
   const settings = await db.query.appSettings.findFirst();
 
+  // Check blocklist
+  const blockedTrack = await db.query.blocklist.findFirst({
+    where: and(
+      eq(schema.blocklist.type, 'track'),
+      eq(schema.blocklist.value, body.spotifyTrackId),
+    ),
+  });
+  if (blockedTrack) {
+    throw createError({
+      message: 'Dieser Song ist nicht verfügbar.',
+      statusCode: 403,
+    });
+  }
+
+  const blockedArtist = await db.query.blocklist.findFirst({
+    where: and(
+      eq(schema.blocklist.type, 'artist'),
+      eq(schema.blocklist.value, body.artist.toLowerCase()),
+    ),
+  });
+  if (blockedArtist) {
+    throw createError({
+      message: 'Dieser Interpret ist momentan nicht verfügbar.',
+      statusCode: 403,
+    });
+  }
+
   // Check "no repeats all night" — block songs already queued/played
   if (settings?.noRepeatsAllNight) {
     const alreadyPlayed = await db.query.songRequests.findFirst({

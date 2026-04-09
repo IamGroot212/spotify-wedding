@@ -31,6 +31,40 @@ async function updateSetting(key: keyof Settings, value: boolean | number) {
     saving.value = false;
   }
 }
+
+// Blocklist
+const blockType = ref<'artist' | 'track'>('artist');
+const blockValue = ref('');
+const { data: blocklistData, refresh: refreshBlocklist } = useFetch<{
+  items: Array<{ id: number; type: string; value: string }>;
+}>('/api/admin/blocklist', { server: false });
+
+async function addToBlocklist() {
+  if (!blockValue.value.trim())
+    return;
+  try {
+    await $fetch('/api/admin/blocklist', {
+      body: { type: blockType.value, value: blockValue.value.trim() },
+      method: 'POST',
+    });
+    blockValue.value = '';
+    await refreshBlocklist();
+    toast.add({ color: 'success', title: 'Zur Blocklist hinzugefügt' });
+  }
+  catch {
+    toast.add({ color: 'error', title: 'Fehler beim Hinzufügen' });
+  }
+}
+
+async function removeFromBlocklist(id: number) {
+  try {
+    await $fetch(`/api/admin/blocklist/${id}`, { method: 'DELETE' });
+    await refreshBlocklist();
+  }
+  catch {
+    toast.add({ color: 'error', title: 'Fehler beim Entfernen' });
+  }
+}
 </script>
 
 <template>
@@ -117,6 +151,65 @@ async function updateSetting(key: keyof Settings, value: boolean | number) {
             >
           </div>
         </div>
+      </div>
+
+      <!-- Blocklist -->
+      <div class="rounded-2xl border border-white/5 bg-[#1d1b1a] p-6">
+        <h2 class="mb-4 text-xs font-medium uppercase tracking-widest text-gold-300/40">
+          Blocklist
+        </h2>
+
+        <!-- Add form -->
+        <div class="mb-4 flex gap-2">
+          <select
+            v-model="blockType"
+            class="rounded-lg border-none bg-neutral-500 px-3 py-2 text-sm text-neutral-50"
+          >
+            <option value="artist">
+              Interpret
+            </option>
+            <option value="track">
+              Track-ID
+            </option>
+          </select>
+          <input
+            v-model="blockValue"
+            class="min-w-0 flex-1 rounded-lg border-none bg-neutral-500 px-3 py-2 text-base text-neutral-50 placeholder:text-neutral-200/40"
+            :placeholder="blockType === 'artist' ? 'Interpret-Name...' : 'Spotify Track-ID...'"
+            @keyup.enter="addToBlocklist"
+          >
+          <button
+            class="shrink-0 rounded-lg bg-gold-300 px-4 py-2 text-sm font-bold text-[#6a5314] transition-all active:scale-95"
+            @click="addToBlocklist"
+          >
+            Sperren
+          </button>
+        </div>
+
+        <!-- Blocklist items -->
+        <div v-if="blocklistData?.items.length" class="space-y-2">
+          <div
+            v-for="item in blocklistData.items"
+            :key="item.id"
+            class="flex items-center justify-between rounded-lg bg-neutral-500/50 px-3 py-2"
+          >
+            <div class="flex items-center gap-2">
+              <span class="rounded bg-neutral-400 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-neutral-100">
+                {{ item.type === 'artist' ? 'Interpret' : 'Track' }}
+              </span>
+              <span class="text-sm text-neutral-50">{{ item.value }}</span>
+            </div>
+            <button
+              class="text-[#ffb4ab]/60 transition-colors hover:text-[#ffb4ab]"
+              @click="removeFromBlocklist(item.id)"
+            >
+              <UIcon class="size-4" name="i-lucide-x" />
+            </button>
+          </div>
+        </div>
+        <p v-else class="text-sm text-neutral-200/40">
+          Keine Einträge gesperrt
+        </p>
       </div>
 
       <!-- Danger Zone -->

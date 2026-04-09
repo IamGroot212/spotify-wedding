@@ -31,8 +31,9 @@ export function useSongRequest() {
       lastResult.value = { message: data.message, success: true };
       toast.add({
         color: 'success',
-        description: data.message,
-        title: 'Eingereicht!',
+        description: `${track.title} — ${track.artist}`,
+        icon: 'i-lucide-check-circle',
+        title: 'Songwunsch eingereicht!',
       });
     }
     catch (err: unknown) {
@@ -44,7 +45,8 @@ export function useSongRequest() {
       toast.add({
         color: 'error',
         description: message,
-        title: 'Fehler',
+        icon: 'i-lucide-alert-circle',
+        title: 'Nicht möglich',
       });
     }
     finally {

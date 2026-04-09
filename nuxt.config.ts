@@ -21,10 +21,15 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'de' },
+      link: [
+        { href: '/favicon.svg', rel: 'icon', type: 'image/svg+xml' },
+        { color: '#e8c97e', href: '/favicon.svg', rel: 'mask-icon' },
+      ],
       meta: [
         { content: 'width=device-width, initial-scale=1, maximum-scale=1', name: 'viewport' },
+        { content: '#141312', name: 'theme-color' },
       ],
-      title: 'Spotify Wedding',
+      title: 'The Midnight Concierge',
     },
   },
 

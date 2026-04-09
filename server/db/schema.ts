@@ -23,6 +23,11 @@ export const spotifyTokens = sqliteTable('spotify_tokens', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 });
 
+export const adminSessions = sqliteTable('admin_sessions', {
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  token: text('token').primaryKey(),
+});
+
 export const appSettings = sqliteTable('app_settings', {
   cooldownSeconds: integer('cooldown_seconds').notNull().default(30),
   duplicateWindowMinutes: integer('duplicate_window_minutes').notNull().default(60),

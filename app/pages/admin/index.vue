@@ -57,6 +57,12 @@ onUnmounted(() => {
         </div>
         <div class="flex items-center gap-3">
           <AdminSpotifyStatus />
+          <NuxtLink
+            class="flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs text-neutral-200/60 transition-colors hover:bg-white/5 hover:text-neutral-200"
+            to="/admin/settings"
+          >
+            <UIcon class="size-4" name="i-lucide-settings" />
+          </NuxtLink>
           <button
             class="flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs text-neutral-200/60 transition-colors hover:bg-white/5 hover:text-neutral-200"
             @click="handleLogout"

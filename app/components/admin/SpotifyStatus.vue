@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data: spotifyStatus } = useFetch<{
+const { data: spotifyStatus, refresh: refreshStatus } = useFetch<{
   connected: boolean;
   expired?: boolean;
 }>('/api/auth/spotify/status', { server: false });
@@ -16,18 +16,27 @@ const { data: devicesData } = useFetch<{
 const activeDevice = computed(() =>
   devicesData.value?.devices?.find(d => d.isActive) || null,
 );
+
+const showMenu = ref(false);
 </script>
 
 <template>
-  <div class="flex items-center gap-3">
-    <!-- Connected badge -->
-    <div
-      v-if="spotifyStatus?.connected && activeDevice"
-      class="hidden items-center gap-2 rounded-full border border-white/5 bg-neutral-500 px-3 py-1.5 md:flex"
+  <div class="relative flex items-center gap-3">
+    <!-- Status badge (clickable) -->
+    <button
+      v-if="spotifyStatus?.connected"
+      class="hidden items-center gap-2 rounded-full border border-white/5 bg-neutral-500 px-3 py-1.5 transition-colors hover:bg-neutral-400 md:flex"
+      @click="showMenu = !showMenu"
     >
-      <span class="size-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-      <span class="text-xs text-neutral-200">{{ activeDevice.name }}</span>
-    </div>
+      <span
+        :class="activeDevice ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 'bg-gold-300'"
+        class="size-2 rounded-full"
+      />
+      <span class="text-xs text-neutral-200">
+        {{ activeDevice ? activeDevice.name : 'Kein Gerät' }}
+      </span>
+      <UIcon class="size-3 text-neutral-200/40" name="i-lucide-chevron-down" />
+    </button>
 
     <!-- Not connected -->
     <a
@@ -39,13 +48,52 @@ const activeDevice = computed(() =>
       Verbinden
     </a>
 
-    <!-- No device -->
-    <div
-      v-else-if="spotifyStatus?.connected && !activeDevice"
-      class="hidden items-center gap-2 rounded-full border border-gold-300/20 bg-gold-900/20 px-3 py-1.5 md:flex"
+    <!-- Dropdown menu -->
+    <Transition
+      enter-active-class="transition-all duration-150"
+      enter-from-class="scale-95 opacity-0"
+      enter-to-class="scale-100 opacity-100"
+      leave-active-class="transition-all duration-100"
+      leave-from-class="scale-100 opacity-100"
+      leave-to-class="scale-95 opacity-0"
     >
-      <UIcon class="size-4 text-gold-300" name="i-lucide-speaker" />
-      <span class="text-xs text-gold-300">Kein Gerät</span>
-    </div>
+      <div
+        v-if="showMenu"
+        class="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl border border-white/10 bg-[#211f1e] p-2 shadow-2xl"
+      >
+        <div class="border-b border-white/5 px-3 py-2">
+          <p class="text-[10px] uppercase tracking-widest text-gold-300/40">
+            Spotify Status
+          </p>
+          <p class="mt-1 text-sm text-neutral-50">
+            {{ spotifyStatus?.connected ? 'Verbunden' : 'Getrennt' }}
+          </p>
+        </div>
+
+        <a
+          class="mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-neutral-200 transition-colors hover:bg-white/5"
+          href="/api/auth/spotify/connect"
+          @click="showMenu = false"
+        >
+          <UIcon class="size-4" name="i-lucide-refresh-cw" />
+          Neu verbinden
+        </a>
+
+        <button
+          class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-neutral-200 transition-colors hover:bg-white/5"
+          @click="refreshStatus(); showMenu = false"
+        >
+          <UIcon class="size-4" name="i-lucide-activity" />
+          Status prüfen
+        </button>
+      </div>
+    </Transition>
+
+    <!-- Click outside to close -->
+    <div
+      v-if="showMenu"
+      class="fixed inset-0 z-40"
+      @click="showMenu = false"
+    />
   </div>
 </template>

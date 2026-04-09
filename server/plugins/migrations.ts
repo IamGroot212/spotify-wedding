@@ -37,6 +37,13 @@ export default defineNitroPlugin(async () => {
   `);
 
   // Migrations: add columns if missing
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS admin_sessions (
+      token TEXT PRIMARY KEY,
+      created_at INTEGER NOT NULL DEFAULT (unixepoch())
+    );
+  `);
+
   const migrations = [
     `ALTER TABLE song_requests ADD COLUMN guest_session_id TEXT`,
     `ALTER TABLE app_settings ADD COLUMN no_repeats_all_night INTEGER NOT NULL DEFAULT 1`,

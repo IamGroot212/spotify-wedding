@@ -44,68 +44,26 @@ async function updateSetting(key: keyof Settings, value: boolean | number) {
           Moderation
         </h2>
         <div class="space-y-5">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-neutral-50">
-                Freigabe erforderlich
-              </p>
-              <p class="text-xs text-neutral-200/60">
-                Songs müssen im Admin genehmigt werden
-              </p>
-            </div>
-            <button
-              :class="data.settings.requireApproval ? 'bg-gold-300' : 'bg-neutral-500'"
-              class="relative h-6 w-11 rounded-full transition-colors"
-              @click="updateSetting('requireApproval', !data.settings.requireApproval)"
-            >
-              <span
-                :class="data.settings.requireApproval ? 'translate-x-[18px]' : 'translate-x-0.5'"
-                class="inline-block size-5 rounded-full bg-white shadow transition-transform"
-              />
-            </button>
-          </div>
+          <USwitch
+            :model-value="data.settings.requireApproval"
+            label="Freigabe erforderlich"
+            description="Songs müssen im Admin genehmigt werden"
+            @update:model-value="updateSetting('requireApproval', $event)"
+          />
 
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-neutral-50">
-                Keine Wiederholungen
-              </p>
-              <p class="text-xs text-neutral-200/60">
-                Jeder Song kann nur einmal pro Abend vorgeschlagen werden
-              </p>
-            </div>
-            <button
-              :class="data.settings.noRepeatsAllNight ? 'bg-gold-300' : 'bg-neutral-500'"
-              class="relative h-6 w-11 rounded-full transition-colors"
-              @click="updateSetting('noRepeatsAllNight', !data.settings.noRepeatsAllNight)"
-            >
-              <span
-                :class="data.settings.noRepeatsAllNight ? 'translate-x-[18px]' : 'translate-x-0.5'"
-                class="inline-block size-5 rounded-full bg-white shadow transition-transform"
-              />
-            </button>
-          </div>
+          <USwitch
+            :model-value="data.settings.noRepeatsAllNight"
+            label="Keine Wiederholungen"
+            description="Jeder Song kann nur einmal pro Abend vorgeschlagen werden"
+            @update:model-value="updateSetting('noRepeatsAllNight', $event)"
+          />
 
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-neutral-50">
-                Explicit-Filter
-              </p>
-              <p class="text-xs text-neutral-200/60">
-                Songs mit expliziten Inhalten blockieren
-              </p>
-            </div>
-            <button
-              :class="data.settings.explicitFilterEnabled ? 'bg-gold-300' : 'bg-neutral-500'"
-              class="relative h-6 w-11 rounded-full transition-colors"
-              @click="updateSetting('explicitFilterEnabled', !data.settings.explicitFilterEnabled)"
-            >
-              <span
-                :class="data.settings.explicitFilterEnabled ? 'translate-x-[18px]' : 'translate-x-0.5'"
-                class="inline-block size-5 rounded-full bg-white shadow transition-transform"
-              />
-            </button>
-          </div>
+          <USwitch
+            :model-value="data.settings.explicitFilterEnabled"
+            label="Explicit-Filter"
+            description="Songs mit expliziten Inhalten blockieren"
+            @update:model-value="updateSetting('explicitFilterEnabled', $event)"
+          />
         </div>
       </div>
 

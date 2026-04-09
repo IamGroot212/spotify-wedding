@@ -5,6 +5,7 @@ const navItems = [
   { icon: 'i-lucide-layout-dashboard', label: 'Requests', to: '/admin' },
   { icon: 'i-lucide-list-music', label: 'Queue', to: '/admin/queue' },
   { icon: 'i-lucide-settings', label: 'Settings', to: '/admin/settings' },
+  { icon: 'i-lucide-activity', label: 'Monitor', to: '/admin/monitor' },
 ];
 
 function isActive(to: string): boolean {

@@ -28,6 +28,56 @@ onUnmounted(() => pause());
 
 const toast = useToast();
 const processingId = ref<number | null>(null);
+const selectedIds = ref(new Set<number>());
+const bulkProcessing = ref(false);
+
+const allSelected = computed(() => {
+  const pending = data.value?.requests.filter(r => r.status === 'pending') || [];
+  return pending.length > 0 && pending.every(r => selectedIds.value.has(r.id));
+});
+
+function toggleAll() {
+  const pending = data.value?.requests.filter(r => r.status === 'pending') || [];
+  if (allSelected.value) {
+    selectedIds.value.clear();
+  }
+  else {
+    pending.forEach(r => selectedIds.value.add(r.id));
+  }
+}
+
+function toggleSelect(id: number) {
+  if (selectedIds.value.has(id)) {
+    selectedIds.value.delete(id);
+  }
+  else {
+    selectedIds.value.add(id);
+  }
+}
+
+async function bulkAction(status: 'queued' | 'rejected') {
+  if (selectedIds.value.size === 0)
+    return;
+  bulkProcessing.value = true;
+  try {
+    const result = await $fetch<{ message: string }>('/api/requests/bulk', {
+      body: { ids: [...selectedIds.value], status },
+      method: 'PATCH',
+    });
+    toast.add({ color: 'success', title: result.message });
+    selectedIds.value.clear();
+    await refresh();
+  }
+  catch (err: unknown) {
+    const message = err && typeof err === 'object' && 'data' in err
+      ? (err.data as { message?: string })?.message || 'Bulk-Aktion fehlgeschlagen'
+      : 'Bulk-Aktion fehlgeschlagen';
+    toast.add({ color: 'error', description: message, title: 'Fehler' });
+  }
+  finally {
+    bulkProcessing.value = false;
+  }
+}
 
 async function updateStatus(id: number, status: 'queued' | 'rejected') {
   processingId.value = id;
@@ -74,6 +124,9 @@ function timeAgo(dateStr: string): string {
 const pendingCount = computed(() =>
   statusFilter.value === 'pending' ? data.value?.requests.length || 0 : null,
 );
+
+// Clear selection when filter changes
+watch(statusFilter, () => selectedIds.value.clear());
 </script>
 
 <template>
@@ -99,6 +152,43 @@ const pendingCount = computed(() =>
       </button>
     </div>
 
+    <!-- Bulk Actions Bar -->
+    <div
+      v-if="statusFilter === 'pending' && data?.requests.length"
+      class="flex items-center gap-3"
+    >
+      <button
+        class="flex items-center gap-2 text-xs text-neutral-200/60 transition-colors hover:text-neutral-200"
+        @click="toggleAll"
+      >
+        <div
+          :class="allSelected ? 'bg-gold-300 border-gold-300' : 'border-white/20'"
+          class="flex size-4 items-center justify-center rounded border transition-colors"
+        >
+          <UIcon v-if="allSelected" class="size-3 text-[#6a5314]" name="i-lucide-check" />
+        </div>
+        Alle auswählen
+      </button>
+
+      <template v-if="selectedIds.size > 0">
+        <span class="text-xs text-gold-300/40">{{ selectedIds.size }} ausgewählt</span>
+        <button
+          :disabled="bulkProcessing"
+          class="rounded-lg bg-gold-300 px-3 py-1 text-xs font-bold text-[#6a5314] transition-all active:scale-95 disabled:opacity-50"
+          @click="bulkAction('queued')"
+        >
+          Alle annehmen
+        </button>
+        <button
+          :disabled="bulkProcessing"
+          class="rounded-lg border border-white/10 px-3 py-1 text-xs text-gold-200/60 transition-all hover:bg-white/5 disabled:opacity-50"
+          @click="bulkAction('rejected')"
+        >
+          Alle ablehnen
+        </button>
+      </template>
+    </div>
+
     <!-- Loading -->
     <div v-if="fetchStatus === 'pending' && !data" class="space-y-4">
       <div v-for="i in 3" :key="i" class="h-24 animate-pulse rounded-2xl bg-neutral-600" />
@@ -109,8 +199,23 @@ const pendingCount = computed(() =>
       <div
         v-for="req in data.requests"
         :key="req.id"
+        :class="selectedIds.has(req.id) ? 'ring-1 ring-gold-300/30' : ''"
         class="flex flex-col gap-4 rounded-2xl bg-[#211f1e] p-4 transition-all duration-300 hover:bg-neutral-500 md:flex-row md:items-center md:gap-6 md:p-6"
       >
+        <!-- Checkbox (pending only) -->
+        <button
+          v-if="req.status === 'pending'"
+          class="hidden shrink-0 md:block"
+          @click="toggleSelect(req.id)"
+        >
+          <div
+            :class="selectedIds.has(req.id) ? 'bg-gold-300 border-gold-300' : 'border-white/20'"
+            class="flex size-5 items-center justify-center rounded border transition-colors"
+          >
+            <UIcon v-if="selectedIds.has(req.id)" class="size-3 text-[#6a5314]" name="i-lucide-check" />
+          </div>
+        </button>
+
         <!-- Song Info -->
         <div class="flex min-w-0 flex-1 items-center gap-4 md:gap-6">
           <div class="relative shrink-0">

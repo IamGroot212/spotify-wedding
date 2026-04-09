@@ -35,23 +35,7 @@ async function updateSetting(key: keyof Settings, value: boolean | number) {
 
 <template>
   <div class="min-h-svh bg-[#141312]">
-    <header class="sticky top-0 z-40 flex items-center justify-between bg-[#141312] px-6 py-4">
-      <div>
-        <h1 class="font-serif text-2xl italic text-gold-300">
-          Einstellungen
-        </h1>
-        <p class="mt-0.5 text-[10px] uppercase tracking-[0.1em] text-gold-300/40">
-          App-Konfiguration
-        </p>
-      </div>
-      <NuxtLink
-        class="flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs text-neutral-200/60 transition-colors hover:bg-white/5"
-        to="/admin"
-      >
-        <UIcon class="size-4" name="i-lucide-arrow-left" />
-        Dashboard
-      </NuxtLink>
-    </header>
+    <AdminHeader />
 
     <div v-if="data?.settings" class="mx-auto max-w-2xl space-y-6 px-6 py-4">
       <!-- Moderation -->

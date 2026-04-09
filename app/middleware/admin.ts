@@ -3,7 +3,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return;
 
   try {
-    const data = await $fetch<{ authenticated: boolean }>('/api/admin/session');
+    // Forward browser cookies during SSR so the session check works
+    const headers = import.meta.server ? useRequestHeaders(['cookie']) : {};
+    const data = await $fetch<{ authenticated: boolean }>('/api/admin/session', { headers });
     if (!data.authenticated) {
       return navigateTo('/admin/login');
     }

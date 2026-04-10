@@ -28,8 +28,10 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const blockedArtist = sqlite.prepare('SELECT id FROM blocklist WHERE type = ? AND value = ?').get('artist', body.artist.toLowerCase());
-  if (blockedArtist) {
+  const blockedArtists = sqlite.prepare('SELECT value FROM blocklist WHERE type = ?').all('artist') as Array<{ value: string }>;
+  const artistLower = body.artist.toLowerCase();
+  const matchedArtist = blockedArtists.find(b => artistLower.includes(b.value));
+  if (matchedArtist) {
     throw createError({
       message: 'Dieser Interpret ist momentan nicht verfügbar.',
       statusCode: 403,

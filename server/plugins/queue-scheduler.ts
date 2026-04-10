@@ -1,3 +1,5 @@
+let lastQueuedAt = 0;
+
 async function processQueue() {
   try {
     const sqlite = useSqlite();
@@ -12,19 +14,23 @@ async function processQueue() {
     if (!nextSong)
       return;
 
-    // Check current Spotify queue — only add if queue is short
-    let queueLength = 0;
+    // Check if currently playing — don't queue if nothing is playing
+    let isPlaying = false;
     try {
-      const queueData = await getQueue();
-      queueLength = queueData.queue?.length || 0;
+      const nowPlaying = await getCurrentlyPlaying();
+      isPlaying = !!nowPlaying?.is_playing;
     }
     catch {
-      // Spotify not connected, skip this cycle
       return;
     }
+    if (!isPlaying)
+      return;
 
-    // Only add if queue has 0-1 items
-    if (queueLength > 1)
+    // Minimum gap: wait at least 3 minutes between our queued songs
+    // This ensures playlist songs play in between
+    const minGapMs = 3 * 60 * 1000;
+    const now = Date.now();
+    if (now - lastQueuedAt < minGapMs)
       return;
 
     // Add to Spotify queue
@@ -32,6 +38,7 @@ async function processQueue() {
 
     // Update status to queued
     sqlite.prepare('UPDATE song_requests SET status = ? WHERE id = ?').run('queued', nextSong.id);
+    lastQueuedAt = now;
 
     // eslint-disable-next-line no-console
     console.log(`[queue-scheduler] Added: ${nextSong.title} - ${nextSong.artist}`);
@@ -45,5 +52,5 @@ export default defineNitroPlugin(() => {
   setInterval(processQueue, 15_000);
 
   // eslint-disable-next-line no-console
-  console.log('[queue-scheduler] Started (15s interval)');
+  console.log('[queue-scheduler] Started (15s interval, 3min gap between songs)');
 });

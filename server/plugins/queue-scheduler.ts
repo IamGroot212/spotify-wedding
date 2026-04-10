@@ -1,49 +1,48 @@
-import { eq } from 'drizzle-orm';
-
-let _intervalId: ReturnType<typeof setInterval> | null = null;
-
 async function processQueue() {
   try {
+    const sqlite = useSqlite();
+
     // Check if scheduler is enabled
-    const settings = await db.query.appSettings.findFirst();
-    if (!settings?.queueSchedulerEnabled)
+    const settings = sqlite.prepare('SELECT queue_scheduler_enabled FROM app_settings WHERE id = 1').get() as { queue_scheduler_enabled: number } | undefined;
+    if (!settings?.queue_scheduler_enabled)
       return;
 
-    // Check if there are approved songs waiting
-    const nextSong = await db.query.songRequests.findFirst({
-      where: eq(schema.songRequests.status, 'approved'),
-      orderBy: (requests, { asc }) => [asc(requests.createdAt)],
-    });
-
+    // Get next approved song (oldest first)
+    const nextSong = sqlite.prepare('SELECT id, spotify_uri, title, artist FROM song_requests WHERE status = ? ORDER BY created_at ASC LIMIT 1').get('approved') as { artist: string; id: number; spotify_uri: string; title: string } | undefined;
     if (!nextSong)
       return;
 
     // Check current Spotify queue — only add if queue is short
-    const queueData = await getQueue();
-    // Only songs we added (not playlist tracks) show in the queue
-    // If queue has 0-1 items, add the next approved song
-    if (queueData.queue.length > 1)
+    let queueLength = 0;
+    try {
+      const queueData = await getQueue();
+      queueLength = queueData.queue?.length || 0;
+    }
+    catch {
+      // Spotify not connected, skip this cycle
+      return;
+    }
+
+    // Only add if queue has 0-1 items
+    if (queueLength > 1)
       return;
 
     // Add to Spotify queue
-    await addToQueue(nextSong.spotifyUri);
+    await addToQueue(nextSong.spotify_uri);
 
-    // Update status
-    await db.update(schema.songRequests)
-      .set({ status: 'queued' })
-      .where(eq(schema.songRequests.id, nextSong.id));
+    // Update status to queued
+    sqlite.prepare('UPDATE song_requests SET status = ? WHERE id = ?').run('queued', nextSong.id);
 
     // eslint-disable-next-line no-console
-    console.log(`[queue-scheduler] Added to queue: ${nextSong.title} - ${nextSong.artist}`);
+    console.log(`[queue-scheduler] Added: ${nextSong.title} - ${nextSong.artist}`);
   }
-  catch {
-    // Silently fail — will retry next interval
+  catch (err) {
+    console.error('[queue-scheduler] Error:', err instanceof Error ? err.message : err);
   }
 }
 
 export default defineNitroPlugin(() => {
-  // Check every 15 seconds
-  _intervalId = setInterval(processQueue, 15_000);
+  setInterval(processQueue, 15_000);
 
   // eslint-disable-next-line no-console
   console.log('[queue-scheduler] Started (15s interval)');

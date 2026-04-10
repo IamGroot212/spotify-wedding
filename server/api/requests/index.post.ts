@@ -19,12 +19,8 @@ export default defineEventHandler(async (event) => {
   const settings = await db.query.appSettings.findFirst();
 
   // Check blocklist
-  const blockedTrack = await db.query.blocklist.findFirst({
-    where: and(
-      eq(schema.blocklist.type, 'track'),
-      eq(schema.blocklist.value, body.spotifyTrackId),
-    ),
-  });
+  const sqlite = useSqlite();
+  const blockedTrack = sqlite.prepare('SELECT id FROM blocklist WHERE type = ? AND value = ?').get('track', body.spotifyTrackId);
   if (blockedTrack) {
     throw createError({
       message: 'Dieser Song ist nicht verfügbar.',
@@ -32,12 +28,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const blockedArtist = await db.query.blocklist.findFirst({
-    where: and(
-      eq(schema.blocklist.type, 'artist'),
-      eq(schema.blocklist.value, body.artist.toLowerCase()),
-    ),
-  });
+  const blockedArtist = sqlite.prepare('SELECT id FROM blocklist WHERE type = ? AND value = ?').get('artist', body.artist.toLowerCase());
   if (blockedArtist) {
     throw createError({
       message: 'Dieser Interpret ist momentan nicht verfügbar.',

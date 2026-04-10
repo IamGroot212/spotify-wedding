@@ -36,9 +36,48 @@ async function updateSetting(key: keyof Settings, value: boolean | number) {
 // Blocklist
 const blockType = ref<'artist' | 'track'>('artist');
 const blockValue = ref('');
+const blockSearch = ref('');
+const blockResults = ref<Array<{ artist: string; coverUrl: string | null; id: string; title: string }>>([]);
+
 const { data: blocklistData, refresh: refreshBlocklist } = useFetch<{
   items: Array<{ id: number; type: string; value: string }>;
 }>('/api/admin/blocklist', { server: false });
+
+let blockSearchTimeout: ReturnType<typeof setTimeout> | undefined;
+function searchForBlock() {
+  clearTimeout(blockSearchTimeout);
+  if (blockSearch.value.length < 2) {
+    blockResults.value = [];
+    return;
+  }
+  blockSearchTimeout = setTimeout(async () => {
+    try {
+      const results = await $fetch<Array<{ artist: string; coverUrl: string | null; id: string; title: string }>>('/api/spotify/search', {
+        params: { limit: 5, q: blockSearch.value },
+      });
+      blockResults.value = results;
+    }
+    catch {
+      blockResults.value = [];
+    }
+  }, 400);
+}
+
+async function blockFromResult(result: { artist: string }) {
+  try {
+    await $fetch('/api/admin/blocklist', {
+      body: { type: 'artist', value: result.artist.trim() },
+      method: 'POST',
+    });
+    blockSearch.value = '';
+    blockResults.value = [];
+    await refreshBlocklist();
+    toast.add({ color: 'success', title: `"${result.artist}" gesperrt` });
+  }
+  catch {
+    toast.add({ color: 'error', title: 'Fehler beim Sperren' });
+  }
+}
 
 async function addToBlocklist() {
   if (!blockValue.value.trim())
@@ -167,7 +206,51 @@ async function removeFromBlocklist(id: number) {
           Blocklist
         </h2>
 
-        <!-- Add form -->
+        <!-- Search + Add -->
+        <div class="relative mb-4">
+          <input
+            v-model="blockSearch"
+            class="w-full rounded-lg border-none bg-neutral-500 px-3 py-2 text-base text-neutral-50 placeholder:text-neutral-200/40"
+            placeholder="Interpret oder Song suchen..."
+            @input="searchForBlock"
+          >
+
+          <!-- Search Results Dropdown -->
+          <div
+            v-if="blockResults.length"
+            class="absolute left-0 right-0 top-full z-10 mt-1 max-h-60 overflow-y-auto rounded-xl border border-white/10 bg-[#211f1e] shadow-2xl"
+          >
+            <button
+              v-for="result in blockResults"
+              :key="result.id"
+              class="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-white/5"
+              @click="blockFromResult(result)"
+            >
+              <img
+                v-if="result.coverUrl"
+                :src="result.coverUrl"
+                class="size-8 rounded object-cover"
+              >
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm text-neutral-50">
+                  {{ result.title }}
+                </p>
+                <p class="truncate text-xs text-neutral-200/60">
+                  {{ result.artist }}
+                </p>
+              </div>
+              <div class="flex shrink-0 gap-1">
+                <span
+                  class="rounded bg-[#93000a]/30 px-2 py-0.5 text-[10px] text-[#ffb4ab] transition-colors hover:bg-[#93000a]/50"
+                >
+                  Interpret sperren
+                </span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Manual add -->
         <div class="mb-4 flex gap-2">
           <select
             v-model="blockType"
@@ -183,7 +266,7 @@ async function removeFromBlocklist(id: number) {
           <input
             v-model="blockValue"
             class="min-w-0 flex-1 rounded-lg border-none bg-neutral-500 px-3 py-2 text-base text-neutral-50 placeholder:text-neutral-200/40"
-            :placeholder="blockType === 'artist' ? 'Interpret-Name...' : 'Spotify Track-ID...'"
+            placeholder="Manuell eingeben..."
             @keyup.enter="addToBlocklist"
           >
           <button

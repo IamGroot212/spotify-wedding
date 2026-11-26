@@ -37,6 +37,31 @@ jobs:
       - name: Build
         run: pnpm exec nuxt build
 
+      - name: Diagnose service
+        continue-on-error: true
+        run: |
+          # Public repo: only print non-secret facts (no ExecStart args, no env values)
+          systemctl show spotify-wedding -p WorkingDirectory -p EnvironmentFiles -p User --no-pager
+          NODE_BIN=$(systemctl show spotify-wedding -p ExecStart --value | grep -o 'path=[^ ;]*' | cut -d= -f2)
+          echo "service binary: ${NODE_BIN:-unknown} ($(${NODE_BIN:-false} -v 2>/dev/null || echo n/a))"
+          df -h /home | tail -1
+          { journalctl -u spotify-wedding -n 200 --no-pager 2>/dev/null || sudo -n journalctl -u spotify-wedding -n 200 --no-pager 2>/dev/null; } \
+            | grep -iE 'error|cannot|module|sqlite|ENOENT|EACCES|ENOSPC' | tail -20 || echo "no journal access or no errors"
+
+      - name: Sync admin password
+        env:
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: |
+          test -n "$ADMIN_PASSWORD" || { echo "Secret ADMIN_PASSWORD is missing"; exit 1; }
+          ENV_FILE=$(systemctl show spotify-wedding -p EnvironmentFiles --value | awk '{print $1}')
+          echo "EnvironmentFile: ${ENV_FILE:-none}"
+          test -n "$ENV_FILE" && test -w "$ENV_FILE" || { echo "Env file not found or not writable"; exit 1; }
+          if grep -q '^NUXT_ADMIN_PASSWORD=' "$ENV_FILE"; then
+            sed -i "s|^NUXT_ADMIN_PASSWORD=.*|NUXT_ADMIN_PASSWORD=${ADMIN_PASSWORD}|" "$ENV_FILE"
+          else
+            echo "NUXT_ADMIN_PASSWORD=${ADMIN_PASSWORD}" >> "$ENV_FILE"
+          fi
+
       - name: Deploy
         run: |
           rsync -a --delete .output/ /home/febec/Programming/claude/spotify-wedding/.output/
@@ -49,6 +74,8 @@ jobs:
           echo "Health check passed"
 
       - name: API tests
+        env:
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
         run: pnpm test
 
       - name: Cleanup test data

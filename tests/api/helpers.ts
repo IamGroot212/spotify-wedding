@@ -22,7 +22,12 @@ export async function apiFetch<T = unknown>(path: string, options: RequestInit =
   return { data, status: res.status };
 }
 
-export async function loginAsAdmin(password = 'BCJHQCS87t5TXb2eSNVSzw'): Promise<string> {
+// Admin password comes from the environment (GitHub secret ADMIN_PASSWORD in CI)
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? '';
+if (!ADMIN_PASSWORD)
+  throw new Error('ADMIN_PASSWORD env var is not set');
+
+export async function loginAsAdmin(password = ADMIN_PASSWORD): Promise<string> {
   const res = await fetch(`${BASE_URL}/api/admin/login`, {
     body: JSON.stringify({ password }),
     headers: { 'Content-Type': 'application/json' },

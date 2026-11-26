@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { apiFetch, loginAsAdmin } from './helpers';
+import { ADMIN_PASSWORD, apiFetch, loginAsAdmin } from './helpers';
 
 describe('admin API', () => {
   describe('gET /api/admin/session', () => {
@@ -21,7 +21,7 @@ describe('admin API', () => {
 
     it('accepts correct password', async () => {
       const { data, status } = await apiFetch<{ ok: boolean }>('/api/admin/login', {
-        body: JSON.stringify({ password: 'BCJHQCS87t5TXb2eSNVSzw' }),
+        body: JSON.stringify({ password: ADMIN_PASSWORD }),
         method: 'POST',
       });
       expect(status).toBe(200);

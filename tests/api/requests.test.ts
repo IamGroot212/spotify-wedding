@@ -40,7 +40,12 @@ describe('requests API', () => {
       expect(status).toBe(200);
       expect(data.message).toBeDefined();
       expect(data.request.id).toBeGreaterThan(0);
-      expect(data.request.status).toBe('pending');
+      // Status depends on the live "require approval" setting
+      const cookie = await loginAsAdmin();
+      const { data: admin } = await apiFetch<{ settings: { requireApproval: boolean } | null }>('/api/admin/settings', {
+        headers: { Cookie: cookie },
+      });
+      expect(data.request.status).toBe(admin.settings?.requireApproval ? 'pending' : 'approved');
     });
 
     it('rejects duplicate within window', async () => {

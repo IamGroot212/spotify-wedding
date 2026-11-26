@@ -79,8 +79,9 @@ async function refreshAccessToken(refreshToken: string) {
   });
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Spotify token refresh failed: ${text}`);
+    // Refresh token revoked or expired: treat like "not connected" so callers get 503
+    console.error(`Spotify token refresh failed: ${await res.text()}`);
+    throw createError({ message: 'Spotify-Verbindung abgelaufen. Bitte im Admin-Bereich neu verbinden.', statusCode: 503 });
   }
 
   return res.json() as Promise<{

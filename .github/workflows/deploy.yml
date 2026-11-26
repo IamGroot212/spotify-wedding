@@ -22,10 +22,16 @@ jobs:
         with:
           version: 10
 
+      # Build with the same Node as the systemd service (/usr/bin/node), otherwise
+      # better-sqlite3's native module fails to load ("Module did not self-register").
+      - name: Detect service Node version
+        id: sysnode
+        run: echo "version=$(/usr/bin/node -v)" >> "$GITHUB_OUTPUT"
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ steps.sysnode.outputs.version }}
           cache: pnpm
 
       - name: Install dependencies
@@ -36,17 +42,6 @@ jobs:
 
       - name: Build
         run: pnpm exec nuxt build
-
-      - name: Diagnose service
-        continue-on-error: true
-        run: |
-          # Public repo: only print non-secret facts (no ExecStart args, no env values)
-          systemctl show spotify-wedding -p WorkingDirectory -p EnvironmentFiles -p User --no-pager
-          NODE_BIN=$(systemctl show spotify-wedding -p ExecStart --value | grep -o 'path=[^ ;]*' | cut -d= -f2)
-          echo "service binary: ${NODE_BIN:-unknown} ($(${NODE_BIN:-false} -v 2>/dev/null || echo n/a))"
-          df -h /home | tail -1
-          { journalctl -u spotify-wedding -n 200 --no-pager 2>/dev/null || sudo -n journalctl -u spotify-wedding -n 200 --no-pager 2>/dev/null; } \
-            | grep -iE 'error|cannot|module|sqlite|ENOENT|EACCES|ENOSPC' | tail -20 || echo "no journal access or no errors"
 
       - name: Sync admin password
         env:
